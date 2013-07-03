@@ -66,14 +66,14 @@ namespace Inedo.BuildMasterExtensions.Jira
         /// <returns>
         /// The URL of the specified issue if applicable; otherwise null.
         /// </returns>
-        public override string GetIssueUrl(Issue issue)
+        public override string GetIssueUrl(IssueTrackerIssue issue)
         {
             if (issue == null)
                 throw new ArgumentNullException("issue");
 
             return CombinePaths(this.BaseUrl, string.Format(JiraUrlFormatString, issue.IssueId));
         }
-        public override Issue[] GetIssues(string releaseNumber)
+        public override IssueTrackerIssue[] GetIssues(string releaseNumber)
         {
             string projectFilter = (this.CategoryIdFilter != null && this.CategoryIdFilter.Length > 0) 
                 ? string.Format(" and project = \"{0}\"", this.CategoryIdFilter[0])
@@ -96,7 +96,7 @@ namespace Inedo.BuildMasterExtensions.Jira
 
             return issueList.ToArray();
         }
-        public override bool IsIssueClosed(Issue issue)
+        public override bool IsIssueClosed(IssueTrackerIssue issue)
         {
             // depending on the configuration of the provider, a Resolved status may be considered closed for promotion purposes
             return issue.IssueStatus == JiraIssue.DefaultStatusNames.Closed 
@@ -117,7 +117,7 @@ namespace Inedo.BuildMasterExtensions.Jira
                 throw new NotAvailableException(ex.Message, ex);
             }
         }
-        public CategoryBase[] GetCategories()
+        public IssueTrackerCategory[] GetCategories()
         {
             var remoteProjects = this.Service.getProjectsNoSchemes(this.Token);
 

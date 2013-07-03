@@ -5,13 +5,13 @@ using Inedo.BuildMasterExtensions.Jira.JiraApi;
 namespace Inedo.BuildMasterExtensions.Jira
 {
     [Serializable]
-    internal sealed class JiraCategory : CategoryBase
+    internal sealed class JiraCategory : IssueTrackerCategory
     {
         public enum CategoryTypes { Project }
 
         public CategoryTypes CategoryType { get; private set; }
 
-        private JiraCategory(string categoryId, string categoryName, CategoryBase[] subCategories, CategoryTypes categoryType)
+        private JiraCategory(string categoryId, string categoryName, IssueTrackerCategory[] subCategories, CategoryTypes categoryType)
             : base(categoryId, categoryName, subCategories) 
         { 
             CategoryType = categoryType;
