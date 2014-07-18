@@ -75,6 +75,11 @@ namespace Inedo.BuildMasterExtensions.Jira
         }
         public override IssueTrackerIssue[] GetIssues(string releaseNumber)
         {
+            var versions = this.Service.getVersions(this.Token, this.CategoryIdFilter[0]);
+            var version = Array.Find(versions, v => releaseNumber.Equals((v.name ?? "").Trim(), StringComparison.OrdinalIgnoreCase));
+            if (version == null)
+                return new JiraIssue[0];
+
             string projectFilter = (this.CategoryIdFilter != null && this.CategoryIdFilter.Length > 0) 
                 ? string.Format(" and project = \"{0}\"", this.CategoryIdFilter[0])
                 : "";
@@ -218,7 +223,7 @@ namespace Inedo.BuildMasterExtensions.Jira
 
             // If version is already created, do nothing.
             var versions = this.Service.getVersions(this.Token, this.CategoryIdFilter[0]);
-            if (Array.Find(versions, v => releaseNumber.Equals((v.name ?? "").Trim(), StringComparison.OrdinalIgnoreCase)) == null)
+            if (Array.Find(versions, v => releaseNumber.Equals((v.name ?? "").Trim(), StringComparison.OrdinalIgnoreCase)) != null)
                 return;
 
             // Otherwise add it.
@@ -226,7 +231,7 @@ namespace Inedo.BuildMasterExtensions.Jira
         }
         public override string ToString()
         {
-            return "Connects to the Jira issue tracking system version 4.0 or later.";
+            return "Connects to the JIRA issue tracking system version 4.0 or later.";
         }
 
         private static string CombinePaths(string baseUrl, string relativeUrl)
