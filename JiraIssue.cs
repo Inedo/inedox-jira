@@ -1,89 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
-using Inedo.BuildMaster.Extensibility.Providers.IssueTracking;
+using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
 using Inedo.BuildMasterExtensions.Jira.JiraApi;
 
 namespace Inedo.BuildMasterExtensions.Jira
 {
     [Serializable]
-    internal sealed class JiraIssue : IssueTrackerIssue
+    internal sealed class JiraIssue : IIssueTrackerIssue
     {
-        private string issueId;
-        private string issueTitle;
-        private string issueStatus;
-        private string issueDescription;
-        private string releaseNumber;
+        private RemoteIssue remoteIssue;
+        private Dictionary<string, string> statuses;
 
-        /// <summary>
-        /// A collection of static strings describing default workflow statuses for Jira
-        /// </summary>
-        internal static class DefaultStatusNames
+        public JiraIssue(RemoteIssue remoteIssue, Dictionary<string, string> statuses)
         {
-            public static string Open = "Open";
-            public static string InProgress = "In Progress";
-            public static string Reopened = "Reopened";
-            public static string Resolved = "Resolved";
-            public static string Closed = "Closed";
+            this.remoteIssue = remoteIssue;
+            this.statuses = statuses;
         }
 
-        internal string[] AvailableStatusNames { get; private set; }
-
-        internal string IssueStatusId { get; private set; }
-
-        public override string IssueStatus
+        public string Id
         {
-            get { return this.issueStatus; }
+            get { return this.remoteIssue.key; }
         }
-        public override string IssueDescription
+        public string Title
         {
-            get { return this.issueDescription; }
+            get { return this.remoteIssue.summary; }
         }
-        public override string IssueId
+        public string Description
         {
-            get { return this.issueId; }
+            get { return this.remoteIssue.description; }
         }
-        public override string IssueTitle
+        public bool IsClosed
         {
-            get { return this.issueTitle; }
+            get { return !string.IsNullOrEmpty(this.remoteIssue.resolution); }
         }
-        public override string ReleaseNumber
+        public string Status
         {
-            get { return this.releaseNumber; }
+            get { return this.statuses.GetValueOrDefault(this.remoteIssue.status, this.remoteIssue.status); }
         }
-
-        internal JiraIssue(JiraSoapServiceService service, string authToken, RemoteIssue remoteIssue)
+        public DateTime SubmittedDate
         {
-            // get list of statuses
-            List<string> availableStatusNames = new List<string>();
-            RemoteStatus[] remoteStatuses = service.getStatuses(authToken);
-            foreach (RemoteStatus remoteStatus in remoteStatuses)
-            {
-                availableStatusNames.Add(remoteStatus.name);
-                if (remoteStatus.id == remoteIssue.status) this.issueStatus = remoteStatus.name; // set the IssueStatus property to the name of the status, not the id
-            }
-            AvailableStatusNames = availableStatusNames.ToArray();
-
-            // set the base properties of this issue
-            this.issueDescription = remoteIssue.description;
-            this.issueId = remoteIssue.key;
-            this.issueTitle = remoteIssue.summary;
-            this.IssueStatusId = remoteIssue.status; // BuildMaster uses IssueStatus to represent the name of the status, Jira's property "status" represents the id
-
-            // grab the first fix version if there are multiple
-            RemoteVersion[] fixVersions = remoteIssue.fixVersions;
-            if (fixVersions != null && fixVersions.Length > 0)
-            {
-                this.releaseNumber = fixVersions[0].id; 
-            }
+            get { return this.remoteIssue.created ?? DateTime.UtcNow; }
         }
-
-        internal bool StatusExists(string status)
+        public string Submitter
         {
-            foreach (string availableStatus in AvailableStatusNames)
-            {
-                if (availableStatus == status) return true;
-            }
-            return false;
+            get { return this.remoteIssue.reporter; }
         }
     }
 }

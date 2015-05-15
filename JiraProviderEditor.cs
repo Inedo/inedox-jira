@@ -29,9 +29,6 @@ namespace Inedo.BuildMasterExtensions.Jira
             if (!string.IsNullOrEmpty(provider.RelativeServiceUrl))
                 this.txtRelativeServiceUrl.Text = provider.RelativeServiceUrl;
             this.txtBaseUrl.Text = provider.BaseUrl;
-            this.ddlConsiderResolvedStatusAsClosed.SelectedValue = (provider.ConsiderResolvedStatusClosed)
-                ? "Yes"
-                : "No";
         }
         public override ProviderBase CreateFromForm()
         {
@@ -43,7 +40,6 @@ namespace Inedo.BuildMasterExtensions.Jira
                 Password = txtPassword.Text,
                 RelativeServiceUrl = txtRelativeServiceUrl.Text,
                 BaseUrl = txtBaseUrl.Text,
-                ConsiderResolvedStatusClosed = ddlConsiderResolvedStatusAsClosed.SelectedValue == "Yes"
             };
         }
 

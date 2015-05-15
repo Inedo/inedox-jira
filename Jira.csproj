@@ -66,11 +66,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BuildMaster.Web.Controls">
-      <HintPath>packages\Inedo.BuildMaster.SDK.4.3\lib\net40\BuildMaster.Web.Controls.dll</HintPath>
+      <HintPath>packages\Inedo.BuildMaster.SDK.4.7\lib\net40\BuildMaster.Web.Controls.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="BuildMasterCore">
-      <HintPath>packages\Inedo.BuildMaster.SDK.4.3\lib\net40\BuildMasterCore.dll</HintPath>
+      <HintPath>packages\Inedo.BuildMaster.SDK.4.7\lib\net40\BuildMasterCore.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
@@ -78,7 +78,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="InedoLib">
-      <HintPath>packages\Inedo.BuildMaster.SDK.4.3\lib\net40\InedoLib.dll</HintPath>
+      <HintPath>packages\Inedo.BuildMaster.SDK.4.7\lib\net40\InedoLib.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -89,9 +89,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="JiraApplicationFilter.cs" />
+    <Compile Include="JiraApplicationFilterEditor.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="JiraCategory.cs" />
     <Compile Include="JiraIssue.cs" />
     <Compile Include="JiraProvider.cs" />
+    <Compile Include="JiraProvider.Legacy.cs" />
     <Compile Include="JiraProviderEditor.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -221,6 +226,11 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="JiraApplicationFilterEditor.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -231,6 +241,6 @@
   -->
   <PropertyGroup>
     <PostBuildEvent>if exist $(SolutionDir) cmd /c "del $(SolutionDir)..\..\BuildMaster\ExtensionLib\$(TargetName).bmx"
-if exist $(SolutionDir) $(SolutionDir)..\zip -j $(SolutionDir)..\..\BuildMaster\ExtensionLib\$(TargetName).bmx *.dll</PostBuildEvent>
+if exist $(SolutionDir) $(SolutionDir)..\zip -j $(SolutionDir)..\..\BuildMaster\ExtensionLib\$(TargetName).bmx *.*</PostBuildEvent>
   </PropertyGroup>
 </Project>
