@@ -10,11 +10,13 @@ namespace Inedo.BuildMasterExtensions.Jira
     {
         private RemoteIssue remoteIssue;
         private Dictionary<string, string> statuses;
+        private string baseUrl;
 
-        public JiraIssue(RemoteIssue remoteIssue, Dictionary<string, string> statuses)
+        public JiraIssue(RemoteIssue remoteIssue, Dictionary<string, string> statuses, string baseUrl)
         {
             this.remoteIssue = remoteIssue;
             this.statuses = statuses;
+            this.baseUrl = baseUrl;
         }
 
         public string Id
@@ -44,6 +46,10 @@ namespace Inedo.BuildMasterExtensions.Jira
         public string Submitter
         {
             get { return this.remoteIssue.reporter; }
+        }
+        public string Url
+        {
+            get { return this.baseUrl + "/browse/" + Uri.EscapeDataString(this.remoteIssue.key); }
         }
     }
 }

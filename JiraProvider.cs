@@ -111,8 +111,10 @@ namespace Inedo.BuildMasterExtensions.Jira
             if (issues.Length == 0)
                 return Enumerable.Empty<IIssueTrackerIssue>();
 
+            var baseUrl = this.BaseUrl.TrimEnd('/');
+
             return from i in issues
-                   select new JiraIssue(i, this.IssueStatuses);
+                   select new JiraIssue(i, this.IssueStatuses, baseUrl);
         }
 
         public override IssueTrackerApplicationConfiguration GetDefaultApplicationConfiguration(int applicationId)
