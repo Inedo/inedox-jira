@@ -117,7 +117,7 @@ namespace Inedo.BuildMasterExtensions.Jira
                    select new JiraIssue(i, this.IssueStatuses, baseUrl);
         }
 
-        public override IssueTrackerApplicationConfiguration GetDefaultApplicationConfiguration(int applicationId)
+        public override IssueTrackerApplicationConfigurationBase GetDefaultApplicationConfiguration(int applicationId)
         {
             if (this.legacyFilter != null)
                 return this.legacyFilter;

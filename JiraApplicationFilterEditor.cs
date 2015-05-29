@@ -15,13 +15,13 @@ namespace Inedo.BuildMasterExtensions.Jira
     {
         private HiddenField ctlProject;
 
-        public override void BindToForm(IssueTrackerApplicationConfiguration extension)
+        public override void BindToForm(IssueTrackerApplicationConfigurationBase extension)
         {
             var filter = (JiraApplicationFilter)extension;
 
             this.ctlProject.Value = filter.ProjectId;
         }
-        public override IssueTrackerApplicationConfiguration CreateFromForm()
+        public override IssueTrackerApplicationConfigurationBase CreateFromForm()
         {
             return new JiraApplicationFilter
             {
