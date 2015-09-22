@@ -15,7 +15,7 @@ namespace Inedo.BuildMasterExtensions.Jira
        "JIRA",
        "Supports JIRA 4.0 and later.")]
     [CustomEditor(typeof(JiraProviderEditor))]
-    public sealed partial class JiraProvider : IssueTrackerConnectionBase, IReleaseManager, IIssueCloser, IIssueCommenter
+    public sealed partial class JiraProvider : IssueTrackerConnectionBase, IReleaseManager, IIssueCloser, IIssueCommenter, IIssueStatusUpdater
     {
         private Lazy<JiraSoapServiceService> getService;
         private Lazy<string> getToken;
@@ -50,31 +50,17 @@ namespace Inedo.BuildMasterExtensions.Jira
         [Persistent]
         public string RelativeServiceUrl { get; set; }
 
-        private JiraSoapServiceService Service
-        {
-            get { return this.getService.Value; }
-        }
-        private string Token
-        {
-            get { return this.getToken.Value; }
-        }
-        private Dictionary<string, string> IssueStatuses
-        {
-            get { return this.getIssueStatuses.Value; }
-        }
+        private JiraSoapServiceService Service => this.getService.Value;
+        private string Token => this.getToken.Value;
+        private Dictionary<string, string> IssueStatuses => this.getIssueStatuses.Value;
 
-        public override ExtensionComponentDescription GetDescription()
-        {
-            return new ExtensionComponentDescription(
+        public override ExtensionComponentDescription GetDescription() =>
+            new ExtensionComponentDescription(
                 "JIRA at ",
                 new Hilite(this.BaseUrl)
             );
-        }
 
-        public override bool IsAvailable()
-        {
-            return true;
-        }
+        public override bool IsAvailable() => true;
 
         public override void ValidateConnection()
         {
@@ -258,6 +244,73 @@ namespace Inedo.BuildMasterExtensions.Jira
                 closeAction.id,
                 new RemoteFieldValue[0]
             );
+        }
+
+        private void ChangeIssueStatusInternal(JiraIssue issue, string toStatus)
+        {
+            this.LogDebug($"Changing {issue.Id} to {toStatus} status...");
+            var issueId = ((JiraIssue)issue).remoteIssue.id;
+            
+            // get available actions for the issue (e.g. "Resolve issue" or "Close issue")
+            var availableActions = this.Service.getAvailableActions(this.Token, issueId);
+
+            // build a list of permitted action names and grab the id of the action that contains the newStatus (i.e. "Resolve issue" contains all but the last char in "Resolved")
+            var permittedActions = new List<string>();
+            string actionId = null;
+            string newStatusPart = toStatus.Substring(0, toStatus.Length - 1);
+            foreach (var action in availableActions)
+            {
+                permittedActions.Add(action.name);
+                if (action.name.Contains(newStatusPart))
+                    actionId = action.id;
+            }
+
+            if (actionId == null)
+                throw new ArgumentException(string.Format("Changing the status to {0} is not permitted in the current workflow. The only permitted operations are: {1}", toStatus, string.Join(", ", permittedActions.ToArray())));
+
+            this.Service.progressWorkflowAction(
+                this.Token,
+                issueId,
+                actionId,
+                new RemoteFieldValue[0]
+            );
+        }
+
+        void IIssueStatusUpdater.ChangeIssueStatus(IssueTrackerConnectionContext context, string issueId, string issueStatus)
+        {
+            // verify status name is text
+            issueStatus = (issueStatus ?? "").Trim();
+            if (string.IsNullOrEmpty(issueStatus) || issueStatus.Length < 2)
+                throw new ArgumentException("The status being applied must contain text and be at least 2 characters long", "newStatus");
+
+            // return if the issue is already set to the new status
+            var issue = this.Service.getIssue(this.Token, issueId);
+            var jiraIssue = new JiraIssue(issue, this.IssueStatuses, this.BaseUrl);
+            if (jiraIssue.Status == issueStatus) {
+                this.LogDebug($"{jiraIssue.Id} is already in the {issueStatus} status.");
+                return;
+            }
+
+            this.ChangeIssueStatusInternal(jiraIssue, issueStatus);
+        }
+                
+        void IIssueStatusUpdater.ChangeStatusForAllIssues(IssueTrackerConnectionContext context, string fromStatus, string toStatus)
+        {
+            // verify status name is text
+            toStatus = (toStatus ?? "").Trim();
+            if (string.IsNullOrEmpty(toStatus) || toStatus.Length < 2)
+                throw new ArgumentException("The status being applied must contain text and be at least 2 characters long", "newStatus");
+
+            foreach (var jiraIssue in this.EnumerateIssues(context))
+            {
+                if (jiraIssue.Status != fromStatus)
+                {
+                    this.LogDebug($"{jiraIssue.Id} is not in the {fromStatus} status, and will not be changed.");
+                    continue;
+                }
+
+                this.ChangeIssueStatusInternal((JiraIssue)jiraIssue, toStatus);
+            }
         }
     }
 }

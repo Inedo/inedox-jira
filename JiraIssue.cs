@@ -8,7 +8,7 @@ namespace Inedo.BuildMasterExtensions.Jira
     [Serializable]
     internal sealed class JiraIssue : IIssueTrackerIssue
     {
-        private RemoteIssue remoteIssue;
+        internal RemoteIssue remoteIssue;
         private Dictionary<string, string> statuses;
         private string baseUrl;
 
@@ -19,37 +19,13 @@ namespace Inedo.BuildMasterExtensions.Jira
             this.baseUrl = baseUrl;
         }
 
-        public string Id
-        {
-            get { return this.remoteIssue.key; }
-        }
-        public string Title
-        {
-            get { return this.remoteIssue.summary; }
-        }
-        public string Description
-        {
-            get { return this.remoteIssue.description; }
-        }
-        public bool IsClosed
-        {
-            get { return !string.IsNullOrEmpty(this.remoteIssue.resolution); }
-        }
-        public string Status
-        {
-            get { return this.statuses.GetValueOrDefault(this.remoteIssue.status, this.remoteIssue.status); }
-        }
-        public DateTime SubmittedDate
-        {
-            get { return this.remoteIssue.created ?? DateTime.UtcNow; }
-        }
-        public string Submitter
-        {
-            get { return this.remoteIssue.reporter; }
-        }
-        public string Url
-        {
-            get { return this.baseUrl + "/browse/" + Uri.EscapeDataString(this.remoteIssue.key); }
-        }
+        public string Id => this.remoteIssue.key;
+        public string Title => this.remoteIssue.summary;
+        public string Description => this.remoteIssue.description;
+        public bool IsClosed => !string.IsNullOrEmpty(this.remoteIssue.resolution);
+        public string Status => this.statuses.GetValueOrDefault(this.remoteIssue.status, this.remoteIssue.status);
+        public DateTime SubmittedDate => this.remoteIssue.created ?? DateTime.UtcNow; 
+        public string Submitter => this.remoteIssue.reporter;
+        public string Url => this.baseUrl + "/browse/" + Uri.EscapeDataString(this.remoteIssue.key);
     }
 }

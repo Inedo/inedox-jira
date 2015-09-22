@@ -240,7 +240,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>if exist $(SolutionDir) cmd /c "del $(SolutionDir)..\..\BuildMaster-4.7\ExtensionLib\$(TargetName).bmx"
-if exist $(SolutionDir) $(SolutionDir)..\zip -j $(SolutionDir)..\..\BuildMaster-4.7\ExtensionLib\$(TargetName).bmx *.*</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
