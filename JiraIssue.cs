@@ -20,6 +20,7 @@ namespace Inedo.BuildMasterExtensions.Jira
         }
 
         public string Id => this.remoteIssue.key;
+        public string Type => this.remoteIssue.type;
         public string Title => this.remoteIssue.summary;
         public string Description => this.remoteIssue.description;
         public bool IsClosed => !string.IsNullOrEmpty(this.remoteIssue.resolution);
