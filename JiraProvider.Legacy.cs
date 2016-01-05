@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
 using Inedo.BuildMaster.Extensibility.Providers.IssueTracking;
 
 namespace Inedo.BuildMasterExtensions.Jira
 {
     partial class JiraProvider : ICategoryFilterable
     {
-        private JiraApplicationFilter legacyFilter;
+        internal JiraApplicationFilter legacyFilter;
 
         string[] ICategoryFilterable.CategoryIdFilter
         {
@@ -31,13 +31,8 @@ namespace Inedo.BuildMasterExtensions.Jira
 
         IssueTrackerCategory[] ICategoryFilterable.GetCategories()
         {
-            var remoteProjects = this.Service.getProjectsNoSchemes(this.Token);
-
-            var categories = new List<JiraCategory>();
-            foreach (var project in remoteProjects)
-                categories.Add(JiraCategory.CreateProject(project));
-
-            return categories.ToArray();
+            return (from p in this.Client.GetProjects()
+                    select JiraCategory.CreateProject(p)).ToArray();
         }
     }
 }

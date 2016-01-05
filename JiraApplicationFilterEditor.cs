@@ -68,11 +68,11 @@ namespace Inedo.BuildMasterExtensions.Jira
                             {
                                 ctlProject = ctlProject.ClientID,
                                 data = from p in projects
-                                       orderby p.Value
+                                       orderby p.Name
                                        select new
                                        {
-                                           id = p.Key,
-                                           text = p.Value
+                                           id = p.Id,
+                                           text = p.Name
                                        }
                             }
                         );
@@ -82,10 +82,10 @@ namespace Inedo.BuildMasterExtensions.Jira
             );
         }
 
-        private static Dictionary<string, string> GetProjects(Tables.Applications_Extended application)
+        private static IEnumerable<JiraProject> GetProjects(Tables.Applications_Extended application)
         {
             if (application.IssueTracking_Provider_Id == null)
-                return new Dictionary<string, string>(0);
+                return Enumerable.Empty<JiraProject>();
 
             using (var provider = (JiraProvider)Util.Providers.CreateProviderFromId<IssueTrackerConnectionBase>((int)application.IssueTracking_Provider_Id))
             {

@@ -1,6 +1,5 @@
 ﻿using System;
 using Inedo.BuildMaster.Extensibility.Providers.IssueTracking;
-using Inedo.BuildMasterExtensions.Jira.JiraApi;
 
 namespace Inedo.BuildMasterExtensions.Jira
 {
@@ -17,11 +16,11 @@ namespace Inedo.BuildMasterExtensions.Jira
             CategoryType = categoryType;
         }
 
-        internal static JiraCategory CreateProject(RemoteProject remoteProject)
+        internal static JiraCategory CreateProject(JiraProject project)
         {
             return new JiraCategory(
-                remoteProject.key,
-                remoteProject.name,
+                project.Id,
+                project.Name,
                 new JiraCategory[] {},
                 CategoryTypes.Project);
         }
