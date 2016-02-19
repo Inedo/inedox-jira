@@ -30,9 +30,9 @@ namespace Inedo.BuildMasterExtensions.Jira
                 UserName = txtUserName.Text,
                 Password = txtPassword.Text,
                 BaseUrl = txtBaseUrl.Text,
-                ClosedState = InedoLib.Util.CoalesceStr(this.txtClosedState.Text, "Closed"),
-                ApiType = ddlApiType.SelectedValue == JiraApiType.RESTv2.ToString() 
-                                ? JiraApiType.RESTv2 
+                ClosedState = AH.CoalesceString(this.txtClosedState.Text, "Closed"),
+                ApiType = ddlApiType.SelectedValue == JiraApiType.RESTv2.ToString()
+                                ? JiraApiType.RESTv2
                                 : JiraApiType.SOAP
             };
         }
@@ -60,12 +60,12 @@ namespace Inedo.BuildMasterExtensions.Jira
                 },
                 new SlimFormField("User name:", this.txtUserName)
                 {
-                    HelpText = HelpText.FromHtml("This user will be used to authenticate to the JIRA web service. This user must be in both the <b>jira-developers</b> and <b>jira-users</b> groups.")
+                    HelpText = "This user will be used to authenticate to the JIRA web service. This user must be in both the <b>jira-developers</b> and <b>jira-users</b> groups."
                 },
                 new SlimFormField("Password:", this.txtPassword),
                 new SlimFormField("Closed state:", this.txtClosedState)
                 {
-                    HelpText = "This is the status the \"Close Open Issues\" action will use as the " 
+                    HelpText = "This is the status the \"Close Open Issues\" action will use as the "
                                 + "target status for the action."
                 },
                 new SlimFormField("API version:", this.ddlApiType)

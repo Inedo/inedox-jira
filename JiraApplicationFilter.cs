@@ -1,8 +1,8 @@
 ﻿using System;
-using Inedo.BuildMaster;
-using Inedo.BuildMaster.Extensibility;
+using Inedo.BuildMaster.Documentation;
 using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
 using Inedo.BuildMaster.Web;
+using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.Jira
 {
@@ -13,9 +13,9 @@ namespace Inedo.BuildMasterExtensions.Jira
         [Persistent]
         public string ProjectId { get; set; }
 
-        public override ExtensionComponentDescription GetDescription()
+        public override RichDescription GetDescription()
         {
-            return new ExtensionComponentDescription("Project ID: ", this.ProjectId);
+            return new RichDescription("Project ID: ", this.ProjectId);
         }
     }
 }

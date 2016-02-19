@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
-using Inedo.BuildMaster;
 using Inedo.BuildMaster.Data;
-using Inedo.BuildMaster.Extensibility;
+using Inedo.BuildMaster.Documentation;
 using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
-using Inedo.BuildMaster.Extensibility.Providers;
 using Inedo.BuildMaster.Web;
 using Inedo.BuildMasterExtensions.Jira.Clients;
+using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.Jira
 {
-    [ProviderProperties(
-       "JIRA",
-       "Supports locally-hosted JIRA installations and instances hosted by Atlassian Cloud.")]
+    [DisplayName("JIRA")]
+    [Description("Supports locally-hosted JIRA installations and instances hosted by Atlassian Cloud.")]
     [CustomEditor(typeof(JiraProviderEditor))]
     public sealed partial class JiraProvider : IssueTrackerConnectionBase, IReleaseManager, IIssueCloser, IIssueCommenter, IIssueStatusUpdater
     {
@@ -37,11 +36,13 @@ namespace Inedo.BuildMasterExtensions.Jira
 
         private CommonJiraClient Client => this.getClient.Value;
 
-        public override ExtensionComponentDescription GetDescription() =>
-            new ExtensionComponentDescription(
+        public override RichDescription GetDescription()
+        {
+            return new RichDescription(
                 "JIRA at ",
                 new Hilite(this.BaseUrl)
             );
+        }
 
         public override bool IsAvailable() => true;
 
