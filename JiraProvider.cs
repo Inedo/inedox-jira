@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Inedo.BuildMaster.Data;
-using Inedo.BuildMaster.Documentation;
 using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
 using Inedo.BuildMaster.Web;
 using Inedo.BuildMasterExtensions.Jira.Clients;
+using Inedo.Documentation;
 using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.Jira
@@ -61,7 +61,7 @@ namespace Inedo.BuildMasterExtensions.Jira
             if (this.legacyFilter != null)
                 return this.legacyFilter;
 
-            var application = StoredProcs.Applications_GetApplication(applicationId).Execute().Applications_Extended.First();
+            var application = DB.Applications_GetApplication(applicationId).Applications_Extended.First();
             var projects = this.GetProjects();
 
             return new JiraApplicationFilter
