@@ -16,11 +16,11 @@ namespace Inedo.BuildMasterExtensions.Jira
     [CustomEditor(typeof(JiraProviderEditor))]
     public sealed partial class JiraProvider : IssueTrackerConnectionBase, IReleaseManager, IIssueCloser, IIssueCommenter, IIssueStatusUpdater
     {
-        private Lazy<CommonJiraClient> getClient;
+        private Lazy<JiraClient> getClient;
 
         public JiraProvider()
         {
-            this.getClient = new Lazy<CommonJiraClient>(this.CreateClient);
+            this.getClient = new Lazy<JiraClient>(this.CreateClient);
         }
 
         [Persistent]
@@ -34,7 +34,7 @@ namespace Inedo.BuildMasterExtensions.Jira
         [Persistent]
         public string ClosedState { get; set; } = "Closed";
 
-        private CommonJiraClient Client => this.getClient.Value;
+        private JiraClient Client => this.getClient.Value;
 
         public override RichDescription GetDescription()
         {
@@ -119,9 +119,9 @@ namespace Inedo.BuildMasterExtensions.Jira
             base.Dispose(disposing);
         }
 
-        private CommonJiraClient CreateClient()
+        private JiraClient CreateClient()
         {
-            var client = CommonJiraClient.Create(this.ApiType, this.BaseUrl, this.UserName, this.Password, this);
+            var client = JiraClient.Create(this.ApiType, this.BaseUrl, this.UserName, this.Password, this);
             return client;
         }
     }

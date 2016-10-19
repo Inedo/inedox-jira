@@ -25,7 +25,7 @@ namespace Inedo.BuildMasterExtensions.Jira.SuggestionProviders
             if (!Enum.TryParse(config["Api"], out api))
                 api = JiraApiType.RESTv2;
 
-            var client = CommonJiraClient.Create(api, credential.ServerUrl, credential.UserName, credential.Password.ToUnsecureString());
+            var client = JiraClient.Create(api, credential.ServerUrl, credential.UserName, credential.Password.ToUnsecureString());
             var proj = from p in client.GetProjects()
                        select p.Name;
 

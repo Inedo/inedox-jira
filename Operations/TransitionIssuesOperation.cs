@@ -57,7 +57,7 @@ Transition-Issues(
         {
             this.LogInformation($"Transitioning JIRA issue status {(this.IssueId != null ? $"of issue ID '{this.IssueId}' " : " ")}from '{(string.IsNullOrEmpty(this.FromStatus) ? "<any status>" : this.FromStatus)}' to '{this.ToStatus}'...");
 
-            var client = CommonJiraClient.Create(this.Api, this.ServerUrl, this.UserName, this.Password.ToUnsecureString(), this);
+            var client = JiraClient.Create(this.Api, this.ServerUrl, this.UserName, this.Password.ToUnsecureString(), this);
 
             var project = this.ResolveProject(client, this.ProjectName);
             if (project == null)

@@ -39,7 +39,7 @@ namespace Inedo.BuildMasterExtensions.Jira.Operations
         [Description("Instances of JIRA v5 and earlier require the SOAP API.")]
         public JiraApiType Api { get; set; }
 
-        internal JiraProject ResolveProject(CommonJiraClient client, string name)
+        internal JiraProject ResolveProject(JiraClient client, string name)
         {
             this.LogDebug($"Resolving project name '{name}'...");
             var project = client.FindProject(name);
@@ -55,7 +55,7 @@ namespace Inedo.BuildMasterExtensions.Jira.Operations
             return project;
         }
 
-        internal JiraIssueType ResolveIssueType(CommonJiraClient client, JiraProject project, string issueTypeName)
+        internal JiraIssueType ResolveIssueType(JiraClient client, JiraProject project, string issueTypeName)
         {
             this.LogDebug($"Resolving issue type name '{issueTypeName}' for project '{project.Name}'...");
             var issueType = client.FindIssueType(project.Id, issueTypeName);

@@ -8,7 +8,7 @@ using Inedo.Diagnostics;
 
 namespace Inedo.BuildMasterExtensions.Jira.Clients
 {
-    internal sealed class JiraSoapClient : CommonJiraClient
+    internal sealed class JiraSoapClient : JiraClient
     {
         private Lazy<JiraSoapServiceService> getService;
         private Lazy<string> getToken;

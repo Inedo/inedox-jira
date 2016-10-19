@@ -66,7 +66,7 @@ Log-Information ""Issue '$JiraIssueId' was created in JIRA."";
         {
             this.LogInformation("Creating JIRA issue...");
 
-            var client = CommonJiraClient.Create(this.Api, this.ServerUrl, this.UserName, this.Password.ToUnsecureString(), this);
+            var client = JiraClient.Create(this.Api, this.ServerUrl, this.UserName, this.Password.ToUnsecureString(), this);
 
             var project = this.ResolveProject(client, this.ProjectName);
             if (project == null)

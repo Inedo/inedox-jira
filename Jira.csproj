@@ -101,7 +101,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Clients\CommonJiraClient.cs" />
+    <Compile Include="Clients\JiraClient.cs" />
     <Compile Include="Clients\JiraContext.cs" />
     <Compile Include="Clients\JiraIssueType.cs" />
     <Compile Include="Credentials\JiraCredentials.cs" />

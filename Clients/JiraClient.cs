@@ -6,14 +6,14 @@ using Inedo.Diagnostics;
 
 namespace Inedo.BuildMasterExtensions.Jira.Clients
 {
-    internal abstract class CommonJiraClient : IDisposable
+    internal abstract class JiraClient : IDisposable
     {
         protected string userName;
         protected string password;
         protected string serverUrl;
         protected ILogger log;
 
-        protected CommonJiraClient(string serverUrl, string userName, string password, ILogger log)
+        protected JiraClient(string serverUrl, string userName, string password, ILogger log)
         {
             if (string.IsNullOrEmpty(serverUrl))
                 throw new ArgumentNullException(nameof(serverUrl));
@@ -28,9 +28,9 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
             this.log = log ?? Logger.Null;
         }
 
-        public static CommonJiraClient Create(JiraApiType apiType, string serverUrl, string userName, string password, ILogger log = null)
+        public static JiraClient Create(JiraApiType apiType, string serverUrl, string userName, string password, ILogger log = null)
         {
-            CommonJiraClient client;
+            JiraClient client;
             if (apiType == JiraApiType.SOAP)
                 client = new JiraSoapClient(serverUrl, userName, password, log);
             else if (apiType == JiraApiType.RESTv2)

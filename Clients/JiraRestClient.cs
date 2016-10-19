@@ -8,7 +8,7 @@ using Inedo.Diagnostics;
 
 namespace Inedo.BuildMasterExtensions.Jira.Clients
 {
-    internal sealed class JiraRestClient : CommonJiraClient
+    internal sealed class JiraRestClient : JiraClient
     {
         private RestApiClient restClient;
 
