@@ -19,7 +19,7 @@ namespace Inedo.BuildMasterExtensions.Jira
         internal static JiraCategory CreateProject(JiraProject project)
         {
             return new JiraCategory(
-                project.Id,
+                project.Key,
                 project.Name,
                 new JiraCategory[] {},
                 CategoryTypes.Project);

@@ -53,7 +53,7 @@ namespace Inedo.BuildMasterExtensions.Jira
 
         public override IEnumerable<IIssueTrackerIssue> EnumerateIssues(IssueTrackerConnectionContext context)
         {
-            return this.Client.EnumerateIssues(context);
+            return this.Client.EnumerateIssues(new JiraContext(this, context));
         }
 
         public override IssueTrackerApplicationConfigurationBase GetDefaultApplicationConfiguration(int applicationId)
@@ -68,42 +68,42 @@ namespace Inedo.BuildMasterExtensions.Jira
             {
                 ProjectId = projects
                     .Where(p => string.Equals(p.Name, application.Application_Name, StringComparison.OrdinalIgnoreCase))
-                    .Select(p => p.Id)
+                    .Select(p => p.Key)
                     .FirstOrDefault()
             };
         }
 
         void IReleaseManager.DeployRelease(IssueTrackerConnectionContext context)
         {
-            this.Client.DeployRelease(context);
+            this.Client.DeployRelease(new JiraContext(this, context));
         }
         void IReleaseManager.CreateRelease(IssueTrackerConnectionContext context)
         {
-            this.Client.CreateRelease(context);
+            this.Client.CreateRelease(new JiraContext(this, context));
         }
 
         void IIssueCloser.CloseIssue(IssueTrackerConnectionContext context, string issueId)
         {
-            this.Client.CloseIssue(context, issueId);
+            this.Client.CloseIssue(new JiraContext(this, context), issueId);
         }
         void IIssueCloser.CloseAllIssues(IssueTrackerConnectionContext context)
         {
-            this.Client.CloseAllIssues(context);
+            this.Client.CloseAllIssues(new JiraContext(this, context));
         }
 
         void IIssueCommenter.AddComment(IssueTrackerConnectionContext context, string issueId, string commentText)
         {
-            this.Client.AddComment(context, issueId, commentText);
+            this.Client.AddComment(new JiraContext(this, context), issueId, commentText);
         }
 
         void IIssueStatusUpdater.ChangeIssueStatus(IssueTrackerConnectionContext context, string issueId, string issueStatus)
         {
-            this.Client.ChangeIssueStatus(context, issueId, issueStatus);
+            this.Client.TransitionIssue(new JiraContext(this, context), issueId, issueStatus);
         }
 
         void IIssueStatusUpdater.ChangeStatusForAllIssues(IssueTrackerConnectionContext context, string fromStatus, string toStatus)
         {
-            this.Client.ChangeStatusForAllIssues(context, fromStatus, toStatus);
+            this.Client.TransitionIssuesInStatus(new JiraContext(this, context), fromStatus, toStatus);
         }
 
         internal IEnumerable<JiraProject> GetProjects()
@@ -121,18 +121,7 @@ namespace Inedo.BuildMasterExtensions.Jira
 
         private CommonJiraClient CreateClient()
         {
-            CommonJiraClient client;
-            if (this.ApiType == JiraApiType.SOAP)
-                client = new JiraSoapClient(this);
-            else if (this.ApiType == JiraApiType.RESTv2)
-                client = new JiraRestClient(this);
-            else
-                throw new InvalidOperationException("Invalid JIRA client version specified: " + this.ApiType);
-
-            this.LogDebug($"Loading JIRA {this.ApiType} client...");
-
-            client.MessageLogged += (s, e) => this.Log(e.Level, e.Message);
-
+            var client = CommonJiraClient.Create(this.ApiType, this.BaseUrl, this.UserName, this.Password, this);
             return client;
         }
     }

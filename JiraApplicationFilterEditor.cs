@@ -38,7 +38,7 @@ namespace Inedo.BuildMasterExtensions.Jira
             this.ctlProject = new SelectList(
                 (from p in projects
                  orderby p.Name
-                 select new SelectListItem(p.Name, p.Id)).ToList()
+                 select new SelectListItem(p.Name, p.Key)).ToList()
             );
 
             this.Controls.Add(

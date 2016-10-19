@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Inedo.BuildMasterExtensions.Jira.RestApi
+namespace Inedo.BuildMasterExtensions.Jira
 {
     internal sealed class Transition
     {
