@@ -146,12 +146,12 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
 
         public override IIssueTrackerIssue CreateIssue(JiraContext context, string title, string description, string type)
         {
-            throw new NotImplementedException();
+            return this.restClient.CreateIssue(context.ProjectKey, title, description, type);
         }
 
-        public override IEnumerable<JiraIssueType> GetIssueTypes(string projectName)
+        public override IEnumerable<JiraIssueType> GetIssueTypes(string projectId)
         {
-            throw new NotImplementedException();
+            return this.restClient.GetIssueTypes(projectId);
         }
 
         private ProjectVersion TryGetVersion(JiraContext context)

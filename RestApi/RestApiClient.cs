@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Web.Script.Serialization;
+using Inedo.BuildMasterExtensions.Jira.Clients;
 
 namespace Inedo.BuildMasterExtensions.Jira.RestApi
 {
@@ -108,6 +109,32 @@ namespace Inedo.BuildMasterExtensions.Jira.RestApi
             );
         }
 
+        public Issue CreateIssue(string projectKey, string summary, string description, string issueType)
+        {
+            var result = (Dictionary<string, object>)this.Invoke(
+                "POST",
+                "issue",
+                data: new
+                {
+                    fields = new
+                    {
+                        project = new
+                        {
+                            key = projectKey
+                        },
+                        summary = summary,
+                        description = description,
+                        issueType = new
+                        {
+                            name = issueType
+                        }
+                    }
+                }
+            );
+
+            return this.GetIssue(result["key"].ToString());
+        }
+
         public Issue GetIssue(string issueKey)
         {
             var result = (Dictionary<string, object>)this.Invoke(
@@ -116,6 +143,19 @@ namespace Inedo.BuildMasterExtensions.Jira.RestApi
             );
 
             return new Issue(result, this.host);
+        }
+
+        public IEnumerable<JiraIssueType> GetIssueTypes(string projectId)
+        {
+            QueryString query = null;
+            if (projectId != null)
+                query = new QueryString { Jql = $"project='{projectId}'" };
+
+            var result = (IEnumerable<object>)this.Invoke("GET", "issuetype", query);
+            foreach (var issueType in result)
+            {
+                yield return new JiraIssueType((Dictionary<string, object>)result);
+            }
         }
 
         public IEnumerable<Issue> GetIssues(string projectKey, string versionName)
@@ -138,7 +178,7 @@ namespace Inedo.BuildMasterExtensions.Jira.RestApi
         {
             string url = this.apiBaseUrl + relativeUrl + query?.ToString();
 
-            var request = (HttpWebRequest)HttpWebRequest.Create(url);
+            var request = (HttpWebRequest)WebRequest.Create(url);
             request.UserAgent = "BuildMasterJiraExtension/" + typeof(RestApiClient).Assembly.GetName().Version.ToString();
             request.ContentType = "application/json";
             request.Method = method;
@@ -166,11 +206,8 @@ namespace Inedo.BuildMasterExtensions.Jira.RestApi
                     return js.DeserializeObject(reader.ReadToEnd());
                 }
             }
-            catch (WebException ex)
+            catch (WebException ex) when (ex.Response != null)
             {
-                if (ex.Response == null)
-                    throw;
-
                 using (var responseStream = ex.Response.GetResponseStream())
                 {
                     string message;
