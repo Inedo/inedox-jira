@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using Inedo.BuildMasterExtensions.Jira.JiraApi;
 
-namespace Inedo.BuildMasterExtensions.Jira.RestApi
+namespace Inedo.BuildMasterExtensions.Jira
 {
     internal sealed class ProjectVersion
     {
+        public ProjectVersion()
+        {
+        }
+
         public static ProjectVersion Parse(Dictionary<string, object> v)
         {
             string id = v?["id"].ToString();
@@ -19,8 +24,11 @@ namespace Inedo.BuildMasterExtensions.Jira.RestApi
             };
         }
 
-        private ProjectVersion()
+        public ProjectVersion(RemoteVersion version)
         {
+            this.Id = version.id;
+            this.Name = version.name;
+            this.Released = version.released;
         }
 
         public string Id { get; private set; }

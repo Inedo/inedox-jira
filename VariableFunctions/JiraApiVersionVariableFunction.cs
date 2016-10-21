@@ -14,7 +14,7 @@ namespace Inedo.BuildMasterExtensions.Jira.VariableFunctions
     {
         protected override object EvaluateScalar(IGenericBuildMasterContext context)
         {
-            return JiraApiType.RESTv2.ToString();
+            return string.Empty;
         }
     }
 }

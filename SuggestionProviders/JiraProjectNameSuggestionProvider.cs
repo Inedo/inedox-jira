@@ -17,15 +17,17 @@ namespace Inedo.BuildMasterExtensions.Jira.SuggestionProviders
             var empty = Task.FromResult(Enumerable.Empty<string>());
 
             string credentialName = config["CredentialName"];
+            if (string.IsNullOrEmpty(credentialName))
+                return empty;
+
             var credential = ResourceCredentials.Create<JiraCredentials>(credentialName);
             if (credential == null)
                 return empty;
 
             JiraApiType api;
-            if (!Enum.TryParse(config["Api"], out api))
-                api = JiraApiType.RESTv2;
+            api = Enum.TryParse(config["Api"], out api) ? api : JiraApiType.AutoDetect;
 
-            var client = JiraClient.Create(api, credential.ServerUrl, credential.UserName, credential.Password.ToUnsecureString());
+            var client = JiraClient.Create(credential.ServerUrl, credential.UserName, credential.Password.ToUnsecureString(), apiType: api);
             var proj = from p in client.GetProjects()
                        select p.Name;
 

@@ -16,7 +16,7 @@ namespace Inedo.BuildMasterExtensions.Jira.Operations
     [Tag(Tags.IssueTracking)]
     [ScriptAlias("Transition-Issues")]
     [Example(@"
-# closes issues for the HDARS project
+# closes issues for the HDARS project for the current release
 Transition-Issues(
     Credentials: Jira7Local,
     Project: HDARS,
@@ -51,19 +51,20 @@ Transition-Issues(
         [ScriptAlias("FixFor")]
         [DisplayName("With fix for version")]
         [PlaceholderText("$ReleaseNumber")]
+        [SuggestibleValue(typeof(JiraFixForVersionSuggestionProvider))]
         public string ReleaseNumber { get; set; }
 
         public override Task ExecuteAsync(IOperationExecutionContext context)
         {
             this.LogInformation($"Transitioning JIRA issue status {(this.IssueId != null ? $"of issue ID '{this.IssueId}' " : " ")}from '{(string.IsNullOrEmpty(this.FromStatus) ? "<any status>" : this.FromStatus)}' to '{this.ToStatus}'...");
 
-            var client = JiraClient.Create(this.Api, this.ServerUrl, this.UserName, this.Password.ToUnsecureString(), this);
+            var client = JiraClient.Create(this.ServerUrl, this.UserName, this.Password.ToUnsecureString(), this, this.Api);
 
             var project = this.ResolveProject(client, this.ProjectName);
             if (project == null)
                 return Complete;
 
-            var jiraContext = new JiraContext(project.Key, this.ReleaseNumber ?? context.ReleaseNumber, null);
+            var jiraContext = new JiraContext(project, this.ReleaseNumber ?? context.ReleaseNumber, null);
 
             if (this.IssueId != null)
             {

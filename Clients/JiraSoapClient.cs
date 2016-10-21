@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
 using Inedo.BuildMaster.Extensibility.Providers;
 using Inedo.BuildMasterExtensions.Jira.JiraApi;
@@ -62,7 +63,17 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
 
             return result;
         }
-        
+
+        public override IEnumerable<ProjectVersion> GetProjectVersions(string projectKey)
+        {
+            var remoteVersions = this.Service.getVersions(this.Token, projectKey);
+
+            var result = from v in remoteVersions
+                         select new ProjectVersion();
+
+            return result;
+        }
+
         public override IEnumerable<JiraIssueType> GetIssueTypes(string projectId)
         {
             RemoteIssueType[] issueTypes;
@@ -140,34 +151,34 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
 
         public override void CreateRelease(JiraContext context)
         {
-            var releaseNumber = context.ReleaseNumber;
+            var releaseNumber = context.FixForVersion;
             if (string.IsNullOrEmpty(releaseNumber))
                 throw new ArgumentNullException("releaseNumber");
 
-            if (string.IsNullOrEmpty(context?.ProjectKey))
+            if (string.IsNullOrEmpty(context.Project.Key))
                 throw new InvalidOperationException("Application must be specified in category ID filter to create a release.");
 
             // If version is already created, do nothing.
-            var versions = this.Service.getVersions(this.Token, context.ProjectKey);
+            var versions = this.Service.getVersions(this.Token, context.Project.Key);
             if (Array.Find(versions, v => releaseNumber.Equals((v.name ?? "").Trim(), StringComparison.OrdinalIgnoreCase)) != null)
                 return;
 
             // Otherwise add it.
-            this.Service.addVersion(this.Token, context.ProjectKey, new RemoteVersion { name = releaseNumber });
+            this.Service.addVersion(this.Token, context.Project.Key, new RemoteVersion { name = releaseNumber });
 
         }
 
         public override void DeployRelease(JiraContext context)
         {
-            var releaseNumber = context.ReleaseNumber;
+            var releaseNumber = context.FixForVersion;
             if (string.IsNullOrEmpty(releaseNumber))
                 throw new ArgumentNullException("releaseNumber");
 
-            if (string.IsNullOrEmpty(context?.ProjectKey))
+            if (string.IsNullOrEmpty(context.Project.Key))
                 throw new InvalidOperationException("Application must be specified in category ID filter to close a release.");
 
             // Ensure version exists.
-            var versions = this.Service.getVersions(this.Token, context.ProjectKey);
+            var versions = this.Service.getVersions(this.Token, context.Project.Key);
             var version = Array.Find(versions, v => releaseNumber.Equals((v.name ?? "").Trim(), StringComparison.OrdinalIgnoreCase));
             if (version == null)
                 throw new InvalidOperationException("Version " + releaseNumber + " does not exist.");
@@ -179,24 +190,24 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
             // Otherwise release it.
             version.released = true;
             version.releaseDate = DateTime.Now;
-            this.Service.releaseVersion(this.Token, context.ProjectKey, version);
+            this.Service.releaseVersion(this.Token, context.Project.Key, version);
         }
 
         public override IEnumerable<IIssueTrackerIssue> EnumerateIssues(JiraContext context)
         {
-            var version = this.Service.getVersions(this.Token, context.ProjectKey)
-                .FirstOrDefault(v => string.Equals(v.name, context.ReleaseNumber, StringComparison.OrdinalIgnoreCase));
+            var version = this.Service.getVersions(this.Token, context.Project.Key)
+                .FirstOrDefault(v => string.Equals(v.name, context.FixForVersion, StringComparison.OrdinalIgnoreCase));
 
             if (version == null)
                 return Enumerable.Empty<IIssueTrackerIssue>();
 
             var projectFilter = string.Empty;
-            if (!string.IsNullOrEmpty(context.ProjectKey))
-                projectFilter = " and project = \"" + context.ProjectKey + "\"";
+            if (!string.IsNullOrEmpty(context.Project.Key))
+                projectFilter = " and project = \"" + context.Project.Key + "\"";
 
             var issues = this.Service.getIssuesFromJqlSearch(
                 this.Token,
-                string.Format("fixVersion = \"{0}\" {1}", context.ReleaseNumber, projectFilter),
+                string.Format("fixVersion = \"{0}\" {1}", context.FixForVersion, projectFilter),
                 int.MaxValue
             );
 
@@ -207,6 +218,12 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
 
             return from i in issues
                    select new JiraIssue(i, this.IssueStatuses, baseUrl);
+        }
+
+        public override Task<IEnumerable<IIssueTrackerIssue>> EnumerateIssuesAsync(JiraContext context)
+        {
+            var issues = this.EnumerateIssues(context);
+            return Task.FromResult(issues);
         }
 
         protected override void Dispose(bool disposing)
@@ -255,18 +272,18 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
 
         public override IIssueTrackerIssue CreateIssue(JiraContext context, string title, string description, string type)
         {
-            var versions = this.Service.getVersions(this.Token, context.ProjectKey)
-                .Where(v => string.Equals(v.name, context.ReleaseNumber, StringComparison.OrdinalIgnoreCase))
+            var versions = this.Service.getVersions(this.Token, context.Project.Key)
+                .Where(v => string.Equals(v.name, context.FixForVersion, StringComparison.OrdinalIgnoreCase))
                 .ToArray();
 
-            if (context.ReleaseNumber != null && versions.Length == 0)
-                this.log.LogWarning($"Could not set Fix For version to '{context.ReleaseNumber}' because it was not found in JIRA for project key '{context.ProjectKey}'.");
+            if (context.FixForVersion != null && versions.Length == 0)
+                this.log.LogWarning($"Could not set Fix For version to '{context.FixForVersion}' because it was not found in JIRA for project key '{context.Project.Key}'.");
 
             var issue = this.Service.createIssue(
                 this.Token,
                 new RemoteIssue
                 {
-                    project = context.ProjectKey,
+                    project = context.Project.Key,
                     summary = title,
                     description = description,
                     type = type,

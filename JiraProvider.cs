@@ -14,6 +14,7 @@ namespace Inedo.BuildMasterExtensions.Jira
     [DisplayName("JIRA")]
     [Description("Supports locally-hosted JIRA installations and instances hosted by Atlassian Cloud.")]
     [CustomEditor(typeof(JiraProviderEditor))]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed partial class JiraProvider : IssueTrackerConnectionBase, IReleaseManager, IIssueCloser, IIssueCommenter, IIssueStatusUpdater
     {
         private Lazy<JiraClient> getClient;
@@ -121,7 +122,7 @@ namespace Inedo.BuildMasterExtensions.Jira
 
         private JiraClient CreateClient()
         {
-            var client = JiraClient.Create(this.ApiType, this.BaseUrl, this.UserName, this.Password, this);
+            var client = JiraClient.Create(this.BaseUrl, this.UserName, this.Password, this, this.ApiType);
             return client;
         }
     }

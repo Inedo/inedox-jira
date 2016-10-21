@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web.Script.Serialization;
+using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
 using Inedo.BuildMasterExtensions.Jira.Clients;
 
 namespace Inedo.BuildMasterExtensions.Jira.RestApi
@@ -172,6 +176,68 @@ namespace Inedo.BuildMasterExtensions.Jira.RestApi
             {
                 yield return new Issue((Dictionary<string, object>)issue, this.host);
             }
+        }
+
+        public async Task<IEnumerable<IIssueTrackerIssue>> GetIssuesAsync(string jql)
+        {
+            var result = (Dictionary<string, object>)await this.GetAsync("search", new QueryString { Jql = jql }).ConfigureAwait(false);
+
+            var issues = (IEnumerable<object>)result["issues"];
+
+            return from i in issues
+                   select new Issue((Dictionary<string, object>)i, this.host);
+        }
+
+        private async Task<object> GetAsync(string relativeUrl, QueryString query)
+        {
+            using (var client = this.CreateClient())
+            {
+                string url = this.apiBaseUrl + relativeUrl + query?.ToString();
+
+                var response = await client.GetAsync(url).ConfigureAwait(false);
+                await HandleError(response).ConfigureAwait(false);
+                string json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var serializer = new JavaScriptSerializer();
+                return serializer.DeserializeObject(json);
+            }
+        }
+
+        private async Task<object> PostAsync(string relativeUrl, QueryString query, object data)
+        {
+            using (var client = this.CreateClient())
+            {
+                string url = this.apiBaseUrl + relativeUrl + query?.ToString();
+
+                var response = await client.PostAsync(url, new StringContent(InedoLib.Util.JavaScript.ToJson(data))).ConfigureAwait(false);
+                await HandleError(response).ConfigureAwait(false);
+                string json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var serializer = new JavaScriptSerializer();
+                return serializer.DeserializeObject(json);
+            }
+        }
+
+        private HttpClient CreateClient()
+        {
+            HttpClient client;
+            if (!string.IsNullOrEmpty(this.UserName))
+                client = new HttpClient(new HttpClientHandler { Credentials = new NetworkCredential(this.UserName, this.Password ?? "") });
+            else
+                client = new HttpClient();
+
+            client.DefaultRequestHeaders.UserAgent.Clear();
+            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("BuildMasterJiraExtension/" + typeof(RestApiClient).Assembly.GetName().Version.ToString()));
+            client.DefaultRequestHeaders.Add("ContentType", "application/json");
+
+            return client;
+        }
+
+        private static async Task HandleError(HttpResponseMessage response)
+        {
+            if (response.IsSuccessStatusCode)
+                return;
+
+            var message = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            throw new Exception($"An error was returned (HTTP {response.StatusCode}) from the JIRA REST API: {message}");
         }
 
         private object Invoke(string method, string relativeUrl, QueryString query = null, object data = null)

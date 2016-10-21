@@ -10,7 +10,7 @@ using Inedo.BuildMasterExtensions.Jira.Credentials;
 
 namespace Inedo.BuildMasterExtensions.Jira.SuggestionProviders
 {
-    public sealed class JiraIssueTypeNameSuggestionProvider : ISuggestionProvider
+    public sealed class JiraFixForVersionSuggestionProvider : ISuggestionProvider
     {
         public Task<IEnumerable<string>> GetSuggestionsAsync(IComponentConfiguration config)
         {
@@ -20,20 +20,26 @@ namespace Inedo.BuildMasterExtensions.Jira.SuggestionProviders
             if (string.IsNullOrEmpty(credentialName))
                 return empty;
 
+            string projectName = config["ProjectName"];
+            if (string.IsNullOrEmpty(projectName))
+                return empty;
+
             var credential = ResourceCredentials.Create<JiraCredentials>(credentialName);
             if (credential == null)
                 return empty;
 
             JiraApiType api;
             api = Enum.TryParse(config["Api"], out api) ? api : JiraApiType.AutoDetect;
-
+            
             var client = JiraClient.Create(credential.ServerUrl, credential.UserName, credential.Password.ToUnsecureString(), apiType: api);
-            var project = client.FindProject(config["ProjectName"]);
+            var proj = client.GetProjects().FirstOrDefault(p => string.Equals(projectName, p.Name, StringComparison.OrdinalIgnoreCase));
+            if (proj == null)
+                return empty;
 
-            var types = from t in client.GetIssueTypes(project?.Id)
-                        select t.Name;
+            var versions = from v in client.GetProjectVersions(proj.Key)
+                           select v.Name;
 
-            return Task.FromResult(types);
+            return Task.FromResult(versions);
         }
     }
 }

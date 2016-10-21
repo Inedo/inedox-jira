@@ -36,7 +36,7 @@ namespace Inedo.BuildMasterExtensions.Jira.Operations
         [ScriptAlias("Api")]
         [DisplayName("API type")]
         [DefaultValue("$JiraApiVersion")]
-        [Description("Instances of JIRA v5 and earlier require the SOAP API.")]
+        [Description("If not set, BuildMaster will try to find a $JiraApiVersion variable in scope, or otherwise will attempt to auto-detect the API version.")]
         public JiraApiType Api { get; set; }
 
         internal JiraProject ResolveProject(JiraClient client, string name)

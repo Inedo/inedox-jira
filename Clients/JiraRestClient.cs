@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
 using Inedo.BuildMaster.Extensibility.Providers;
 using Inedo.BuildMasterExtensions.Jira.RestApi;
@@ -87,19 +88,19 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
             if (version != null)
                 return;
 
-            this.restClient.CreateVersion(context.ProjectKey, context.ReleaseNumber);
+            this.restClient.CreateVersion(context.Project.Key, context.FixForVersion);
         }
 
         public override void DeployRelease(JiraContext context)
         {
             var version = this.TryGetVersion(context);
             if (version == null)
-                throw new InvalidOperationException("Version " + context.ReleaseNumber + " does not exist.");
+                throw new InvalidOperationException("Version " + context.FixForVersion + " does not exist.");
 
             if (version.Released)
                 return;
 
-            this.restClient.ReleaseVersion(context.ProjectKey, version.Id);
+            this.restClient.ReleaseVersion(context.Project.Key, version.Id);
         }
 
         public override IEnumerable<IIssueTrackerIssue> EnumerateIssues(JiraContext context)
@@ -108,12 +109,22 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
             if (version == null)
                 return Enumerable.Empty<IIssueTrackerIssue>();
 
-            return this.restClient.GetIssues(context.ProjectKey, version.Name);
+            return this.restClient.GetIssues(context.Project.Key, version.Name);
+        }
+
+        public override Task<IEnumerable<IIssueTrackerIssue>> EnumerateIssuesAsync(JiraContext context)
+        {   
+            return this.restClient.GetIssuesAsync(context.GetJql());
         }
 
         public override IEnumerable<JiraProject> GetProjects()
         {
             return this.restClient.GetProjects();
+        }
+
+        public override IEnumerable<ProjectVersion> GetProjectVersions(string projectKey)
+        {
+            return this.restClient.GetVersions(projectKey);
         }
 
         public override IEnumerable<Transition> GetTransitions(JiraContext context)
@@ -146,7 +157,7 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
 
         public override IIssueTrackerIssue CreateIssue(JiraContext context, string title, string description, string type)
         {
-            return this.restClient.CreateIssue(context.ProjectKey, title, description, type);
+            return this.restClient.CreateIssue(context.Project.Key, title, description, type);
         }
 
         public override IEnumerable<JiraIssueType> GetIssueTypes(string projectId)
@@ -156,12 +167,12 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
 
         private ProjectVersion TryGetVersion(JiraContext context)
         {
-            if (string.IsNullOrEmpty(context.ReleaseNumber))
-                throw new ArgumentException(nameof(context.ReleaseNumber));
-            if (string.IsNullOrEmpty(context?.ProjectKey))
+            if (string.IsNullOrEmpty(context.FixForVersion))
+                throw new ArgumentException(nameof(context.FixForVersion));
+            if (string.IsNullOrEmpty(context.Project.Key))
                 throw new InvalidOperationException("Application must be specified in category ID filter to create a release.");
 
-            return this.restClient.GetVersions(context.ProjectKey).FirstOrDefault(v => v.Name == context.ReleaseNumber);
+            return this.restClient.GetVersions(context.Project.Key).FirstOrDefault(v => v.Name == context.FixForVersion);
         }
     }
 }

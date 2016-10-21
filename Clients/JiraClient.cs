@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
 using Inedo.Diagnostics;
 
@@ -8,6 +11,8 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
 {
     internal abstract class JiraClient : IDisposable
     {
+        private static ConcurrentDictionary<string, JiraApiType> recommendedApiType = new ConcurrentDictionary<string, JiraApiType>(2, 16, StringComparer.OrdinalIgnoreCase);
+
         protected string userName;
         protected string password;
         protected string serverUrl;
@@ -28,27 +33,46 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
             this.log = log ?? Logger.Null;
         }
 
-        public static JiraClient Create(JiraApiType apiType, string serverUrl, string userName, string password, ILogger log = null)
+        public static JiraClient Create(string serverUrl, string userName, string password, ILogger log = null, JiraApiType apiType = JiraApiType.AutoDetect)
         {
-            JiraClient client;
             if (apiType == JiraApiType.SOAP)
-                client = new JiraSoapClient(serverUrl, userName, password, log);
+            {
+                log?.LogDebug($"Loading specified JIRA SOAP client...");
+                return new JiraSoapClient(serverUrl, userName, password, log);
+            }
             else if (apiType == JiraApiType.RESTv2)
-                client = new JiraRestClient(serverUrl, userName, password, log);
+            {
+                log?.LogDebug($"Loading specified JIRA REST client...");
+                return new JiraRestClient(serverUrl, userName, password, log);
+            }
             else
-                throw new InvalidOperationException("Invalid JIRA client version specified: " + apiType);
+            {
+                log?.LogDebug($"Auto-detecting JIRA client type...");
 
-            log?.LogDebug($"Loading JIRA {apiType} client...");
+                JiraClient client;
 
-            return client;
+                var result = recommendedApiType.GetOrAdd(serverUrl, DetermineApiType);
+                if (result == JiraApiType.AutoDetect)
+                    throw new InvalidOperationException("JIRA API type could not be automatically determined, try specifying the exact version by overriding the $JiraApiVersion variable function.");
+                else if (result == JiraApiType.RESTv2)
+                    client = new JiraRestClient(serverUrl, userName, password, log);
+                else
+                    client = new JiraSoapClient(serverUrl, userName, password, log);
+
+                log?.LogDebug($"Using JIRA {result} client.");
+
+                return client;
+            }
         }
-
+        
         public abstract IEnumerable<JiraProject> GetProjects();
+        public abstract IEnumerable<ProjectVersion> GetProjectVersions(string projectKey);
         public abstract IEnumerable<Transition> GetTransitions(JiraContext context);
 
         public abstract void ValidateConnection();
 
         public abstract IEnumerable<IIssueTrackerIssue> EnumerateIssues(JiraContext context);
+        public abstract Task<IEnumerable<IIssueTrackerIssue>> EnumerateIssuesAsync(JiraContext context);
         public abstract void AddComment(JiraContext context, string issueId, string commentText);
         public abstract void TransitionIssue(JiraContext context, string issueId, string issueStatus);
         public abstract void TransitionIssuesInStatus(JiraContext context, string fromStatus, string toStatus);
@@ -87,5 +111,23 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
         }
 
         public void Dispose() => this.Dispose(true);
+
+        private static JiraApiType DetermineApiType(string serverUrl)
+        {
+            using (var client = new HttpClient())
+            {
+                string testRestUrl = serverUrl.TrimEnd('/') + "/rest/api/2/";
+                var restResult = Task.Run(() => client.GetAsync(testRestUrl)).Result();
+                if ((int)restResult.StatusCode != 404)
+                    return JiraApiType.RESTv2;
+
+                string testSoapUrl = serverUrl.TrimEnd('/') + "/rpc/soap/jirasoapservice-v2";
+                var soapResult = Task.Run(() => client.GetAsync(testSoapUrl)).Result();
+                if ((int)soapResult.StatusCode != 404)
+                    return JiraApiType.SOAP;
+
+                return JiraApiType.AutoDetect;
+            }
+        }
     }
 }

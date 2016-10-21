@@ -53,6 +53,7 @@ Log-Information ""Issue '$JiraIssueId' was created in JIRA."";
         [ScriptAlias("FixFor")]
         [DisplayName("Fix for version")]
         [PlaceholderText("$ReleaseNumber")]
+        [SuggestibleValue(typeof(JiraFixForVersionSuggestionProvider))]
         public string ReleaseNumber { get; set; }
 
         [Output]
@@ -66,7 +67,7 @@ Log-Information ""Issue '$JiraIssueId' was created in JIRA."";
         {
             this.LogInformation("Creating JIRA issue...");
 
-            var client = JiraClient.Create(this.Api, this.ServerUrl, this.UserName, this.Password.ToUnsecureString(), this);
+            var client = JiraClient.Create(this.ServerUrl, this.UserName, this.Password.ToUnsecureString(), this, this.Api);
 
             var project = this.ResolveProject(client, this.ProjectName);
             if (project == null)
@@ -77,7 +78,7 @@ Log-Information ""Issue '$JiraIssueId' was created in JIRA."";
                 return Complete;
 
             var issue = client.CreateIssue(
-                new JiraContext(project.Key, this.ReleaseNumber ?? context.ReleaseNumber, null),
+                new JiraContext(project, this.ReleaseNumber ?? context.ReleaseNumber, null),
                 this.Title,
                 this.Description,
                 type.Id
