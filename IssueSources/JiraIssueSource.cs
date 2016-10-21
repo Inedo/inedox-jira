@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using Inedo.BuildMaster.Extensibility.Credentials;
@@ -20,12 +21,10 @@ namespace Inedo.BuildMasterExtensions.Jira.IssueSources
     {
         [Persistent]
         [DisplayName("Credentials")]
-        [TriggerPostBackOnChange]
         public string CredentialName { get; set; }
         [Persistent]
         [DisplayName("Project name")]
         [SuggestibleValue(typeof(JiraProjectNameSuggestionProvider))]
-        [TriggerPostBackOnChange]
         public string ProjectName { get; set; }
         [Persistent]
         [DisplayName("Fix for version")]
@@ -43,6 +42,11 @@ namespace Inedo.BuildMasterExtensions.Jira.IssueSources
         public async override Task<IEnumerable<IIssueTrackerIssue>> EnumerateIssuesAsync(IIssueSourceEnumerationContext context)
         {
             var credentials = this.TryGetCredentials<JiraCredentials>();
+
+            if (credentials == null)
+                throw new InvalidOperationException("Credentials must be supplied to enumerate JIRA issues.");
+            if (string.IsNullOrEmpty(this.ProjectName) && string.IsNullOrEmpty(this.FixForVersion) && string.IsNullOrEmpty(this.CustomJql))
+                throw new InvalidOperationException("Cannot enumerate JIRA issues unless either a project name, fix version, or custom JQL is specified.");
 
             var client = JiraClient.Create(credentials.ServerUrl, credentials.UserName, credentials.Password.ToUnsecureString(), context.Log);
 

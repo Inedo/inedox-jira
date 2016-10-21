@@ -17,13 +17,12 @@ namespace Inedo.BuildMasterExtensions.Jira.Credentials
         [Persistent]
         [DisplayName("JIRA server URL")]
         public string ServerUrl { get; set; }
-
-        [Required]
+        
         [Persistent]
         [DisplayName("User name")]
+        [PlaceholderText("Anonymous")]
         public string UserName { get; set; }
 
-        [Required]
         [Persistent(Encrypted = true)]
         [DisplayName("Password")]
         [FieldEditMode(FieldEditMode.Password)]

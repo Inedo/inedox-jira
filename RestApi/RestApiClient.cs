@@ -5,10 +5,12 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
+using Inedo.BuildMaster.Extensibility.Operations;
 using Inedo.BuildMasterExtensions.Jira.Clients;
 
 namespace Inedo.BuildMasterExtensions.Jira.RestApi
@@ -218,14 +220,13 @@ namespace Inedo.BuildMasterExtensions.Jira.RestApi
 
         private HttpClient CreateClient()
         {
-            HttpClient client;
-            if (!string.IsNullOrEmpty(this.UserName))
-                client = new HttpClient(new HttpClientHandler { Credentials = new NetworkCredential(this.UserName, this.Password ?? "") });
-            else
-                client = new HttpClient();
+            var client = new HttpClient();
 
             client.DefaultRequestHeaders.UserAgent.Clear();
-            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("BuildMasterJiraExtension/" + typeof(RestApiClient).Assembly.GetName().Version.ToString()));
+            if (!string.IsNullOrEmpty(this.UserName))
+                client.DefaultRequestHeaders.Add("Authorization", "Basic " + Convert.ToBase64String(InedoLib.UTF8Encoding.GetBytes(this.UserName + ":" + this.Password)));
+            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(typeof(Operation).Assembly.GetCustomAttribute<AssemblyProductAttribute>().Product, typeof(Operation).Assembly.GetName().Version.ToString()));
+            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("BuildMasterJiraExtension", typeof(RestApiClient).Assembly.GetName().Version.ToString()));
             client.DefaultRequestHeaders.Add("ContentType", "application/json");
 
             return client;
