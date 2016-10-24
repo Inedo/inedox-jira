@@ -10,6 +10,7 @@ namespace Inedo.BuildMasterExtensions.Jira.VariableFunctions
     [Description("the API version of JIRA to use, either SOAP (for JIRA v5 and earlier) or RESTv2 (for JIRA v6 and later)")]
     [ExtensionConfigurationVariable(Required = false, SuggestionProvider = typeof(JiraApiVersionSuggestionProvider), Type = ExpectedValueDataType.String)]
     [Tag("jira")]
+    [DefaultValue(JiraApiType.AutoDetect)]
     public sealed class JiraApiVersionVariableFunction : ScalarVariableFunction
     {
         protected override object EvaluateScalar(IGenericBuildMasterContext context)
