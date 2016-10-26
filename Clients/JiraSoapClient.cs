@@ -69,7 +69,7 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
             var remoteVersions = this.Service.getVersions(this.Token, projectKey);
 
             var result = from v in remoteVersions
-                         select new ProjectVersion();
+                         select new ProjectVersion(v);
 
             return result;
         }

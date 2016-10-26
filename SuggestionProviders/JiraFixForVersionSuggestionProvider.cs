@@ -14,19 +14,20 @@ namespace Inedo.BuildMasterExtensions.Jira.SuggestionProviders
     {
         public Task<IEnumerable<string>> GetSuggestionsAsync(IComponentConfiguration config)
         {
-            var empty = Task.FromResult(Enumerable.Empty<string>());
+            var empty = new[] { "$ReleaseNumber" };
+            var emptyResult = Task.FromResult((IEnumerable<string>)empty);
 
             string credentialName = config["CredentialName"];
             if (string.IsNullOrEmpty(credentialName))
-                return empty;
+                return emptyResult;
 
             string projectName = config["ProjectName"];
             if (string.IsNullOrEmpty(projectName))
-                return empty;
+                return emptyResult;
 
             var credential = ResourceCredentials.Create<JiraCredentials>(credentialName);
             if (credential == null)
-                return empty;
+                return emptyResult;
 
             JiraApiType api;
             api = Enum.TryParse(config["Api"], out api) ? api : JiraApiType.AutoDetect;
@@ -34,12 +35,12 @@ namespace Inedo.BuildMasterExtensions.Jira.SuggestionProviders
             var client = JiraClient.Create(credential.ServerUrl, credential.UserName, credential.Password.ToUnsecureString(), apiType: api);
             var proj = client.GetProjects().FirstOrDefault(p => string.Equals(projectName, p.Name, StringComparison.OrdinalIgnoreCase));
             if (proj == null)
-                return empty;
+                return emptyResult;
 
             var versions = from v in client.GetProjectVersions(proj.Key)
                            select v.Name;
 
-            return Task.FromResult(versions);
+            return Task.FromResult(empty.Concat(versions));
         }
     }
 }
