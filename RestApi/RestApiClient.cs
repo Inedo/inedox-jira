@@ -115,7 +115,7 @@ namespace Inedo.BuildMasterExtensions.Jira.RestApi
             );
         }
 
-        public Issue CreateIssue(string projectKey, string summary, string description, string issueType)
+        public Issue CreateIssue(string projectKey, string summary, string description, string issueTypeId)
         {
             var result = (Dictionary<string, object>)this.Invoke(
                 "POST",
@@ -132,7 +132,7 @@ namespace Inedo.BuildMasterExtensions.Jira.RestApi
                         description = description,
                         issueType = new
                         {
-                            name = issueType
+                            id = issueTypeId
                         }
                     }
                 }
