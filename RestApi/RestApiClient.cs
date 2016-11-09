@@ -130,7 +130,7 @@ namespace Inedo.BuildMasterExtensions.Jira.RestApi
                         },
                         summary = summary,
                         description = description,
-                        issueType = new
+                        issuetype = new
                         {
                             id = issueTypeId
                         }
