@@ -160,7 +160,7 @@ namespace Inedo.BuildMasterExtensions.Jira.RestApi
             var result = (IEnumerable<object>)this.Invoke("GET", "issuetype", query);
             foreach (var issueType in result)
             {
-                yield return new JiraIssueType((Dictionary<string, object>)result);
+                yield return new JiraIssueType((Dictionary<string, object>)issueType);
             }
         }
 
