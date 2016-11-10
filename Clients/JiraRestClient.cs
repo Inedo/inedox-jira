@@ -157,7 +157,7 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
 
         public override IIssueTrackerIssue CreateIssue(JiraContext context, string title, string description, string type)
         {
-            return this.restClient.CreateIssue(context.Project.Key, title, description, type);
+            return this.restClient.CreateIssue(context.Project.Key, title, description, type, context.FixForVersion);
         }
 
         public override IEnumerable<JiraIssueType> GetIssueTypes(string projectId)

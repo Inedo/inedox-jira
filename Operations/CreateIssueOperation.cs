@@ -54,7 +54,7 @@ Log-Information ""Issue '$JiraIssueId' was created in JIRA."";
         [DisplayName("Fix for version")]
         [PlaceholderText("$ReleaseNumber")]
         [SuggestibleValue(typeof(JiraFixForVersionSuggestionProvider))]
-        public string ReleaseNumber { get; set; }
+        public string FixForVersion { get; set; }
 
         [Output]
         [ScriptAlias("JiraIssueId")]
@@ -78,7 +78,7 @@ Log-Information ""Issue '$JiraIssueId' was created in JIRA."";
                 return Complete;
 
             var issue = client.CreateIssue(
-                new JiraContext(project, this.ReleaseNumber ?? context.ReleaseNumber, null),
+                new JiraContext(project, this.FixForVersion ?? context.ReleaseNumber, null),
                 this.Title,
                 this.Description,
                 type.Id

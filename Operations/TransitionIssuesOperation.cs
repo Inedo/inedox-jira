@@ -52,7 +52,7 @@ Transition-Issues(
         [DisplayName("With fix for version")]
         [PlaceholderText("$ReleaseNumber")]
         [SuggestibleValue(typeof(JiraFixForVersionSuggestionProvider))]
-        public string ReleaseNumber { get; set; }
+        public string FixForVersion { get; set; }
 
         public override Task ExecuteAsync(IOperationExecutionContext context)
         {
@@ -64,7 +64,7 @@ Transition-Issues(
             if (project == null)
                 return Complete;
 
-            var jiraContext = new JiraContext(project, this.ReleaseNumber ?? context.ReleaseNumber, null);
+            var jiraContext = new JiraContext(project, this.FixForVersion ?? context.ReleaseNumber, null);
 
             if (this.IssueId != null)
             {

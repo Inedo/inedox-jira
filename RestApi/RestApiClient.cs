@@ -115,8 +115,16 @@ namespace Inedo.BuildMasterExtensions.Jira.RestApi
             );
         }
 
-        public Issue CreateIssue(string projectKey, string summary, string description, string issueTypeId)
+        public Issue CreateIssue(string projectKey, string summary, string description, string issueTypeId, string fixForVersion)
         {
+            var fixVersions = new List<object>();
+            if (!string.IsNullOrEmpty(fixForVersion))
+            {
+                var version = this.GetVersions(projectKey).FirstOrDefault(v => v.Name == fixForVersion);
+                if (version != null)
+                    fixVersions.Add(new { id = version.Id });
+            }
+
             var result = (Dictionary<string, object>)this.Invoke(
                 "POST",
                 "issue",
@@ -133,7 +141,8 @@ namespace Inedo.BuildMasterExtensions.Jira.RestApi
                         issuetype = new
                         {
                             id = issueTypeId
-                        }
+                        },
+                        fixVersions = fixVersions
                     }
                 }
             );
