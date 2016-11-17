@@ -44,15 +44,16 @@ Transition-Issues(
         [DisplayName("To")]
         [SuggestibleValue(typeof(JiraTransitionNameSuggestionProvider))]
         public string ToStatus { get; set; }
-        [ScriptAlias("Id")]
-        [DisplayName("Specific issue ID")]
-        [PlaceholderText("Any")]
-        public string IssueId { get; set; }
         [ScriptAlias("FixFor")]
         [DisplayName("With fix for version")]
         [PlaceholderText("$ReleaseNumber")]
         [SuggestibleValue(typeof(JiraFixForVersionSuggestionProvider))]
         public string FixForVersion { get; set; }
+        [ScriptAlias("Id")]
+        [DisplayName("Specific issue ID")]
+        [PlaceholderText("Any")]
+        [Description("If an issue ID is supplied, other filters will be ignored.")]
+        public string IssueId { get; set; }
 
         public override Task ExecuteAsync(IOperationExecutionContext context)
         {
