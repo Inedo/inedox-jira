@@ -47,6 +47,8 @@ namespace Inedo.BuildMasterExtensions.Jira.IssueSources
                 throw new InvalidOperationException("Credentials must be supplied to enumerate JIRA issues.");
             if (string.IsNullOrEmpty(this.ProjectName) && string.IsNullOrEmpty(this.FixForVersion) && string.IsNullOrEmpty(this.CustomJql))
                 throw new InvalidOperationException("Cannot enumerate JIRA issues unless either a project name, fix version, or custom JQL is specified.");
+            if (credentials.Password == null)
+                throw new InvalidOperationException("A credential password is required to enumerate JIRA issues.");
 
             var client = JiraClient.Create(credentials.ServerUrl, credentials.UserName, credentials.Password.ToUnsecureString(), context.Log);
 
