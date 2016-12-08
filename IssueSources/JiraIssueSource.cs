@@ -52,7 +52,8 @@ namespace Inedo.BuildMasterExtensions.Jira.IssueSources
 
             var client = JiraClient.Create(credentials.ServerUrl, credentials.UserName, credentials.Password.ToUnsecureString(), context.Log);
 
-            var project = new JiraProject(null, null, this.ProjectName);
+            var project = client.FindProject(this.ProjectName);
+
             var issueContext = new JiraContext(project, this.FixForVersion, this.CustomJql);
 
             var issues = await client.EnumerateIssuesAsync(issueContext).ConfigureAwait(false);

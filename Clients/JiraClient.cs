@@ -116,15 +116,27 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
         {
             using (var client = new HttpClient())
             {
-                string testRestUrl = serverUrl.TrimEnd('/') + "/rest/api/2/";
-                var restResult = Task.Run(() => client.GetAsync(testRestUrl)).Result();
-                if ((int)restResult.StatusCode != 404)
-                    return JiraApiType.RESTv2;
+                try
+                {
+                    string testRestUrl = serverUrl.TrimEnd('/') + "/rest/api/2/";
+                    var restResult = Task.Run(() => client.GetAsync(testRestUrl)).Result();
+                    if ((int)restResult.StatusCode != 404)
+                        return JiraApiType.RESTv2;
+                }
+                catch
+                {
+                }
 
-                string testSoapUrl = serverUrl.TrimEnd('/') + "/rpc/soap/jirasoapservice-v2";
-                var soapResult = Task.Run(() => client.GetAsync(testSoapUrl)).Result();
-                if ((int)soapResult.StatusCode != 404)
-                    return JiraApiType.SOAP;
+                try
+                {
+                    string testSoapUrl = serverUrl.TrimEnd('/') + "/rpc/soap/jirasoapservice-v2";
+                    var soapResult = Task.Run(() => client.GetAsync(testSoapUrl)).Result();
+                    if ((int)soapResult.StatusCode != 404)
+                        return JiraApiType.SOAP;
+                }
+                catch
+                {
+                }
 
                 return JiraApiType.AutoDetect;
             }
