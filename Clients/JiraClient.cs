@@ -118,7 +118,7 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
             {
                 try
                 {
-                    string testRestUrl = serverUrl.TrimEnd('/') + "/rest/api/2/";
+                    string testRestUrl = serverUrl.TrimEnd('/') + "/rest/api/2/serverInfo";
                     var restResult = Task.Run(() => client.GetAsync(testRestUrl)).Result();
                     if ((int)restResult.StatusCode != 404)
                         return JiraApiType.RESTv2;
