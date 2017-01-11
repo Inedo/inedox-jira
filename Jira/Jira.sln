@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildMasterExtension", "BuildMasterExtension.csproj", "{F1AF582F-6A0E-4606-AF25-09A5599F9A3E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildMasterExtension", "BuildMasterExtension\BuildMasterExtension.csproj", "{F1AF582F-6A0E-4606-AF25-09A5599F9A3E}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Common", "Common\Common.shproj", "{F262997E-B163-4A56-8322-8390371BE569}"
 EndProject
