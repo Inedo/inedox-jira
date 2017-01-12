@@ -234,10 +234,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <WebReferenceUrl Include="http://inedoappsv1:8080/rpc/soap/jirasoapservice-v2%3fwsdl">
+    <WebReferenceUrl Include="http://jira/rpc/soap/jirasoapservice-v2%3fwsdl">
       <UrlBehavior>Static</UrlBehavior>
       <RelPath>Web References\JiraApi\</RelPath>
-      <UpdateFromURL>http://inedoappsv1:8080/rpc/soap/jirasoapservice-v2%3fwsdl</UpdateFromURL>
+      <UpdateFromURL>http://jira/rpc/soap/jirasoapservice-v2%3fwsdl</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>

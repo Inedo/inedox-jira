@@ -13,7 +13,7 @@
 // 
 #pragma warning disable 1591
 
-namespace Inedo.BuildMasterExtensions.Jira.JiraApi {
+namespace Inedo.OtterExtensions.Jira.JiraApi {
     using System;
     using System.Web.Services;
     using System.Diagnostics;
