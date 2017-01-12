@@ -5,6 +5,7 @@ using Inedo.BuildMaster;
 using Inedo.BuildMaster.Data;
 using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
 using Inedo.BuildMaster.Web.Controls.Extensions;
+using Inedo.Extensions.Jira;
 using Inedo.Web.Controls;
 
 namespace Inedo.BuildMasterExtensions.Jira

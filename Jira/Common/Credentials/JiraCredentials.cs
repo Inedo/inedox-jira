@@ -1,12 +1,19 @@
 ﻿using System.ComponentModel;
 using System.Security;
-using Inedo.BuildMaster.Extensibility;
-using Inedo.BuildMaster.Extensibility.Credentials;
-using Inedo.BuildMaster.Web;
 using Inedo.Documentation;
 using Inedo.Serialization;
 
+#if BuildMaster
+using Inedo.BuildMaster.Extensibility;
+using Inedo.BuildMaster.Extensibility.Credentials;
+using Inedo.BuildMaster.Web;
 namespace Inedo.BuildMasterExtensions.Jira.Credentials
+#elif Otter
+using Inedo.Otter.Extensibility;
+using Inedo.Otter.Extensibility.Credentials;
+using Inedo.Otter.Extensions;
+namespace Inedo.OtterExtensions.Jira.Credentials
+#endif
 {
     [ScriptAlias("Jira")]
     [DisplayName("JIRA")]

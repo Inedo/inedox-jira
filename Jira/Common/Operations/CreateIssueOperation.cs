@@ -1,19 +1,29 @@
 ﻿using System.ComponentModel;
 using System.Threading.Tasks;
-using Inedo.BuildMaster;
-using Inedo.BuildMaster.Extensibility;
-using Inedo.BuildMaster.Extensibility.Operations;
-using Inedo.BuildMaster.Web.Controls;
-using Inedo.BuildMasterExtensions.Jira.Clients;
-using Inedo.BuildMasterExtensions.Jira.SuggestionProviders;
 using Inedo.Diagnostics;
 using Inedo.Documentation;
+using Inedo.Extensions.Jira.SuggestionProviders;
+using Inedo.Extensions.Jira.Clients;
 
-namespace Inedo.BuildMasterExtensions.Jira.Operations
+#if BuildMaster
+using Inedo.BuildMaster.Extensibility;
+using Inedo.BuildMaster.Extensibility.Credentials;
+using Inedo.BuildMaster.Extensibility.Operations;
+using Inedo.BuildMaster.Web.Controls;
+using Inedo.BuildMasterExtensions.Jira.Credentials;
+#elif Otter
+using Inedo.Otter.Extensibility;
+using Inedo.Otter.Extensibility.Credentials;
+using Inedo.Otter.Extensibility.Operations;
+using Inedo.Otter.Web.Controls;
+using Inedo.OtterExtensions.Jira.Credentials;
+#endif
+
+namespace Inedo.Extensions.Jira.Operations
 {
     [DisplayName("Create Jira Issue")]
     [Description("Creates an issue in Jira.")]
-    [Tag(Tags.IssueTracking)]
+    [Tag("issue-tracking")]
     [ScriptAlias("Create-Issue")]
     [Example(@"
 # create issue for the HDARS project notifying QA that testing is required
@@ -77,8 +87,14 @@ Log-Information ""Issue '$JiraIssueId' was created in JIRA."";
             if (type == null)
                 return Complete;
 
+#if BuildMaster
+            string fixForVersion = this.FixForVersion ?? context.ReleaseNumber;
+#elif Otter
+            string fixForVersion = this.FixForVersion;
+#endif
+
             var issue = client.CreateIssue(
-                new JiraContext(project, this.FixForVersion ?? context.ReleaseNumber, null),
+                new JiraContext(project, fixForVersion, null),
                 this.Title,
                 this.Description,
                 type.Id

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Inedo.BuildMasterExtensions.Jira
+namespace Inedo.Extensions.Jira
 {
     public enum JiraApiType
     {

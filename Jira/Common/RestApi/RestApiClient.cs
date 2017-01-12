@@ -9,11 +9,17 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
+using Inedo.Extensions.Jira.Clients;
+
+#if BuildMaster
 using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
 using Inedo.BuildMaster.Extensibility.Operations;
-using Inedo.BuildMasterExtensions.Jira.Clients;
+#elif Otter
+using Inedo.Otter.Extensibility.Operations;
+using Inedo.OtterExtensions.Jira;
+#endif
 
-namespace Inedo.BuildMasterExtensions.Jira.RestApi
+namespace Inedo.Extensions.Jira.RestApi
 {
     internal sealed class RestApiClient
     {

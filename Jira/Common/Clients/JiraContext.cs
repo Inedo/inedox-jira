@@ -1,6 +1,11 @@
-﻿using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
+﻿#if BuildMaster
+using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
+using Inedo.BuildMasterExtensions.Jira;
+#elif Otter
+using Inedo.OtterExtensions.Jira;
+#endif
 
-namespace Inedo.BuildMasterExtensions.Jira.Clients
+namespace Inedo.Extensions.Jira.Clients
 {
     /// <summary>
     /// Combined filter for all legacy issue tracker implementations and
@@ -14,14 +19,15 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
             this.FixForVersion = fixForVersion;
             this.CustomJql = AH.NullIf(customJql, string.Empty);
         }
-
+#if BuildMaster
         public JiraContext(JiraProvider provider, IssueTrackerConnectionContext c)
         {
             this.FixForVersion = c.ReleaseNumber;
             this.Project = new JiraProject(null, ((JiraApplicationFilter)c.ApplicationConfiguration ?? provider.legacyFilter)?.ProjectId, null);
             this.ClosedState = provider.ClosedState;
         }
-        
+#endif
+
         public JiraProject Project { get; }
         public string FixForVersion { get; }
         public string ClosedState { get; }

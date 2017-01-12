@@ -2,10 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+#if BuildMaster
 using Inedo.BuildMaster.Extensibility;
 using Inedo.BuildMaster.Web.Controls;
+#elif Otter
+using Inedo.Otter.Extensibility;
+using Inedo.Otter.Web.Controls;
+#endif
 
-namespace Inedo.BuildMasterExtensions.Jira.SuggestionProviders
+namespace Inedo.Extensions.Jira.SuggestionProviders
 {
     public sealed class JiraApiVersionSuggestionProvider : ISuggestionProvider
     {

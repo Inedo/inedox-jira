@@ -1,9 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+
+#if BuildMaster
 using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
 using Inedo.BuildMasterExtensions.Jira.JiraApi;
+#elif Otter
+using Inedo.OtterExtensions.Jira;
+using Inedo.OtterExtensions.Jira.JiraApi;
+#endif
 
-namespace Inedo.BuildMasterExtensions.Jira
+namespace Inedo.Extensions.Jira
 {
     [Serializable]
     internal sealed class JiraIssue : IIssueTrackerIssue

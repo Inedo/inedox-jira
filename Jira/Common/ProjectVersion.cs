@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Inedo.BuildMasterExtensions.Jira.JiraApi;
 
-namespace Inedo.BuildMasterExtensions.Jira
+#if BuildMaster
+using Inedo.BuildMasterExtensions.Jira.JiraApi;
+#elif Otter
+using Inedo.OtterExtensions.Jira.JiraApi;
+#endif
+
+namespace Inedo.Extensions.Jira
 {
     internal sealed class ProjectVersion
     {

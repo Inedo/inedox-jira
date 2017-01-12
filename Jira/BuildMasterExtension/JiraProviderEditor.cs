@@ -1,6 +1,7 @@
 ﻿using System.Web.UI.WebControls;
 using Inedo.BuildMaster.Extensibility.Providers;
 using Inedo.BuildMaster.Web.Controls.Extensions;
+using Inedo.Extensions.Jira;
 using Inedo.Web.Controls;
 
 namespace Inedo.BuildMasterExtensions.Jira

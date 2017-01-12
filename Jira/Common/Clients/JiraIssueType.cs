@@ -1,7 +1,12 @@
 ﻿using System.Collections.Generic;
-using Inedo.BuildMasterExtensions.Jira.JiraApi;
 
-namespace Inedo.BuildMasterExtensions.Jira.Clients
+#if BuildMaster
+using Inedo.BuildMasterExtensions.Jira.JiraApi;
+#elif Otter
+using Inedo.OtterExtensions.Jira.JiraApi;
+#endif
+
+namespace Inedo.Extensions.Jira.Clients
 {
     internal sealed class JiraIssueType
     {

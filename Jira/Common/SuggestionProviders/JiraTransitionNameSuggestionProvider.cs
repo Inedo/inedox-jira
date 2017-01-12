@@ -2,13 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Inedo.Extensions.Jira.Clients;
+
+#if BuildMaster
 using Inedo.BuildMaster.Extensibility;
 using Inedo.BuildMaster.Extensibility.Credentials;
 using Inedo.BuildMaster.Web.Controls;
-using Inedo.BuildMasterExtensions.Jira.Clients;
 using Inedo.BuildMasterExtensions.Jira.Credentials;
+#elif Otter
+using Inedo.Otter.Extensibility;
+using Inedo.Otter.Extensibility.Credentials;
+using Inedo.Otter.Web.Controls;
+using Inedo.OtterExtensions.Jira.Credentials;
+#endif
 
-namespace Inedo.BuildMasterExtensions.Jira.SuggestionProviders
+namespace Inedo.Extensions.Jira.SuggestionProviders
 {
     public sealed class JiraTransitionNameSuggestionProvider : ISuggestionProvider
     {

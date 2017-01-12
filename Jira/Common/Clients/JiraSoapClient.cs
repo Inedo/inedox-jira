@@ -2,12 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Inedo.Diagnostics;
+
+#if BuildMaster
 using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
 using Inedo.BuildMaster.Extensibility.Providers;
 using Inedo.BuildMasterExtensions.Jira.JiraApi;
-using Inedo.Diagnostics;
+#elif Otter
+using Inedo.OtterExtensions.Jira;
+using Inedo.OtterExtensions.Jira.JiraApi;
+#endif
 
-namespace Inedo.BuildMasterExtensions.Jira.Clients
+namespace Inedo.Extensions.Jira.Clients
 {
     internal sealed class JiraSoapClient : JiraClient
     {
@@ -42,15 +48,8 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
 
         public override void ValidateConnection()
         {
-            try
-            {
-                var token = this.Service.login(this.userName, this.password);
-                LogOut(this.Service, token);
-            }
-            catch (Exception ex)
-            {
-                throw new NotAvailableException(ex.Message, ex);
-            }
+            var token = this.Service.login(this.userName, this.password);
+            LogOut(this.Service, token);
         }
 
         public override IEnumerable<JiraProject> GetProjects()

@@ -4,10 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
 using Inedo.Diagnostics;
 
-namespace Inedo.BuildMasterExtensions.Jira.Clients
+#if BuildMaster
+using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
+#elif Otter
+using Inedo.OtterExtensions.Jira;
+#endif
+
+namespace Inedo.Extensions.Jira.Clients
 {
     internal abstract class JiraClient : IDisposable
     {

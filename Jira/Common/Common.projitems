@@ -6,8 +6,33 @@
     <SharedGUID>f262997e-b163-4a56-8322-8390371be569</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>Common</Import_RootNamespace>
+    <Import_RootNamespace>Inedo.Extensions</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Clients\JiraClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clients\JiraContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clients\JiraIssueType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clients\JiraRestClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clients\JiraSoapClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Credentials\JiraCredentials.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)JiraApiType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)JiraIssue.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)JiraProject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Operations\CreateIssueOperation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Operations\JiraOperation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Operations\TransitionIssuesOperation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ProjectVersion.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RestApi\Issue.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RestApi\Permission.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RestApi\QueryString.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RestApi\RestApiClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RestApi\Transition.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SdkShims.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SuggestionProviders\JiraApiVersionSuggestionProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SuggestionProviders\JiraFixForVersionSuggestionProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SuggestionProviders\JiraIssueTypeNameSuggestionProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SuggestionProviders\JiraProjectNameSuggestionProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SuggestionProviders\JiraTransitionNameSuggestionProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)VariableFunctions\JiraApiVersionVariableFunction.cs" />
   </ItemGroup>
 </Project>

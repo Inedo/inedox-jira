@@ -11,10 +11,11 @@ using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
 using Inedo.BuildMaster.Variables;
 using Inedo.BuildMaster.Web;
 using Inedo.BuildMaster.Web.Controls;
-using Inedo.BuildMasterExtensions.Jira.Clients;
 using Inedo.BuildMasterExtensions.Jira.Credentials;
-using Inedo.BuildMasterExtensions.Jira.SuggestionProviders;
 using Inedo.Documentation;
+using Inedo.Extensions.Jira;
+using Inedo.Extensions.Jira.Clients;
+using Inedo.Extensions.Jira.SuggestionProviders;
 using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.Jira.IssueSources

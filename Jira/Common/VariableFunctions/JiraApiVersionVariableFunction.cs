@@ -1,8 +1,17 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using Inedo.Documentation;
+using Inedo.Extensions.Jira;
+using Inedo.Extensions.Jira.SuggestionProviders;
+
+#if BuildMaster
 using Inedo.BuildMaster.Extensibility;
 using Inedo.BuildMaster.Extensibility.VariableFunctions;
-using Inedo.BuildMasterExtensions.Jira.SuggestionProviders;
-using Inedo.Documentation;
+#elif Otter
+using Inedo.Otter;
+using Inedo.Otter.Extensibility;
+using Inedo.Otter.Extensibility.VariableFunctions;
+#endif
 
 namespace Inedo.BuildMasterExtensions.Jira.VariableFunctions
 {
@@ -13,9 +22,16 @@ namespace Inedo.BuildMasterExtensions.Jira.VariableFunctions
     [DefaultValue(JiraApiType.AutoDetect)]
     public sealed class JiraApiVersionVariableFunction : ScalarVariableFunction
     {
+#if BuildMaster
         protected override object EvaluateScalar(IGenericBuildMasterContext context)
         {
             return string.Empty;
         }
+#elif Otter
+        protected override object EvaluateScalar(IOtterContext context)
+        {
+            return string.Empty;
+        }
+#endif
     }
 }

@@ -2,12 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Inedo.Diagnostics;
+using Inedo.Extensions.Jira.RestApi;
+
+#if BuildMaster
 using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
 using Inedo.BuildMaster.Extensibility.Providers;
-using Inedo.BuildMasterExtensions.Jira.RestApi;
-using Inedo.Diagnostics;
+#elif Otter
+using Inedo.OtterExtensions.Jira;
+#endif
 
-namespace Inedo.BuildMasterExtensions.Jira.Clients
+namespace Inedo.Extensions.Jira.Clients
 {
     internal sealed class JiraRestClient : JiraClient
     {
@@ -140,19 +145,12 @@ namespace Inedo.BuildMasterExtensions.Jira.Clients
 
         public override void ValidateConnection()
         {
-            try
-            {
-                var browsePermission = this.restClient
-                    .GetPermissions()
-                    .FirstOrDefault(p => p.Key.Equals("BROWSE_PROJECTS", StringComparison.OrdinalIgnoreCase));
+            var browsePermission = this.restClient
+                .GetPermissions()
+                .FirstOrDefault(p => p.Key.Equals("BROWSE_PROJECTS", StringComparison.OrdinalIgnoreCase));
 
-                if (browsePermission == null || !browsePermission.HasPermission)
-                    throw new Exception("The specified account cannot browse projects, therefore no issues can be viewed.");
-            }
-            catch (Exception ex)
-            {
-                throw new NotAvailableException(ex.Message, ex);
-            }
+            if (browsePermission == null || !browsePermission.HasPermission)
+                throw new Exception("The specified account cannot browse projects, therefore no issues can be viewed.");
         }
 
         public override IIssueTrackerIssue CreateIssue(JiraContext context, string title, string description, string type)

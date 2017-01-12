@@ -1,5 +1,6 @@
 ﻿using System;
 using Inedo.BuildMaster.Extensibility.Providers.IssueTracking;
+using Inedo.Extensions.Jira;
 
 namespace Inedo.BuildMasterExtensions.Jira
 {

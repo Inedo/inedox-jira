@@ -1,14 +1,22 @@
 ﻿using System.ComponentModel;
 using System.Security;
+using Inedo.Diagnostics;
+using Inedo.Documentation;
+using Inedo.Extensions.Jira.Clients;
+
+#if BuildMaster
 using Inedo.BuildMaster.Extensibility;
 using Inedo.BuildMaster.Extensibility.Credentials;
 using Inedo.BuildMaster.Extensibility.Operations;
-using Inedo.BuildMasterExtensions.Jira.Clients;
 using Inedo.BuildMasterExtensions.Jira.Credentials;
-using Inedo.Diagnostics;
-using Inedo.Documentation;
+#elif Otter
+using Inedo.Otter.Extensibility;
+using Inedo.Otter.Extensibility.Credentials;
+using Inedo.Otter.Extensibility.Operations;
+using Inedo.OtterExtensions.Jira.Credentials;
+#endif
 
-namespace Inedo.BuildMasterExtensions.Jira.Operations
+namespace Inedo.Extensions.Jira.Operations
 {
     public abstract class JiraOperation : ExecuteOperation, IHasCredentials<JiraCredentials>
     {

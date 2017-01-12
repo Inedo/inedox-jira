@@ -5,8 +5,9 @@ using System.Linq;
 using Inedo.BuildMaster.Data;
 using Inedo.BuildMaster.Extensibility.IssueTrackerConnections;
 using Inedo.BuildMaster.Web;
-using Inedo.BuildMasterExtensions.Jira.Clients;
 using Inedo.Documentation;
+using Inedo.Extensions.Jira;
+using Inedo.Extensions.Jira.Clients;
 using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.Jira

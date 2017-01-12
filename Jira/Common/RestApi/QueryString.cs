@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Inedo.BuildMasterExtensions.Jira.RestApi
+namespace Inedo.Extensions.Jira.RestApi
 {
     internal sealed class QueryString
     {

@@ -1,19 +1,29 @@
 ﻿using System.ComponentModel;
 using System.Threading.Tasks;
-using Inedo.BuildMaster;
-using Inedo.BuildMaster.Extensibility;
-using Inedo.BuildMaster.Extensibility.Operations;
-using Inedo.BuildMaster.Web.Controls;
-using Inedo.BuildMasterExtensions.Jira.Clients;
-using Inedo.BuildMasterExtensions.Jira.SuggestionProviders;
 using Inedo.Diagnostics;
 using Inedo.Documentation;
+using Inedo.Extensions.Jira.SuggestionProviders;
+using Inedo.Extensions.Jira.Clients;
 
-namespace Inedo.BuildMasterExtensions.Jira.Operations
+#if BuildMaster
+using Inedo.BuildMaster.Extensibility;
+using Inedo.BuildMaster.Extensibility.Credentials;
+using Inedo.BuildMaster.Extensibility.Operations;
+using Inedo.BuildMaster.Web.Controls;
+using Inedo.BuildMasterExtensions.Jira.Credentials;
+#elif Otter
+using Inedo.Otter.Extensibility;
+using Inedo.Otter.Extensibility.Credentials;
+using Inedo.Otter.Extensibility.Operations;
+using Inedo.Otter.Web.Controls;
+using Inedo.OtterExtensions.Jira.Credentials;
+#endif
+
+namespace Inedo.Extensions.Jira.Operations
 {
     [DisplayName("Transition Jira Issues")]
     [Description("Transitions issues in JIRA.")]
-    [Tag(Tags.IssueTracking)]
+    [Tag("issue-tracking")]
     [ScriptAlias("Transition-Issues")]
     [Example(@"
 # closes issues for the HDARS project for the current release
@@ -65,7 +75,13 @@ Transition-Issues(
             if (project == null)
                 return Complete;
 
-            var jiraContext = new JiraContext(project, this.FixForVersion ?? context.ReleaseNumber, null);
+#if BuildMaster
+            string fixForVersion = this.FixForVersion ?? context.ReleaseNumber;
+#elif Otter
+            string fixForVersion = this.FixForVersion;
+#endif
+
+            var jiraContext = new JiraContext(project, fixForVersion, null);
 
             if (this.IssueId != null)
             {

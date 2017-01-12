@@ -48,7 +48,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;BuildMaster</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -102,42 +102,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Clients\JiraClient.cs" />
-    <Compile Include="Clients\JiraContext.cs" />
-    <Compile Include="Clients\JiraIssueType.cs" />
-    <Compile Include="Credentials\JiraCredentials.cs" />
     <Compile Include="IssueSources\JiraIssueSource.cs" />
-    <Compile Include="JiraApiType.cs" />
-    <Compile Include="JiraProject.cs" />
-    <Compile Include="Clients\JiraRestClient.cs" />
-    <Compile Include="Clients\JiraSoapClient.cs" />
     <Compile Include="JiraApplicationFilter.cs" />
     <Compile Include="JiraApplicationFilterEditor.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="JiraCategory.cs" />
-    <Compile Include="JiraIssue.cs" />
     <Compile Include="JiraProvider.cs" />
     <Compile Include="JiraProvider.Legacy.cs" />
     <Compile Include="JiraProviderEditor.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Operations\TransitionIssuesOperation.cs" />
-    <Compile Include="Operations\JiraOperation.cs" />
-    <Compile Include="Operations\CreateIssueOperation.cs" />
-    <Compile Include="RestApi\Issue.cs" />
-    <Compile Include="RestApi\Permission.cs" />
-    <Compile Include="RestApi\RestApiClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RestApi\QueryString.cs" />
-    <Compile Include="RestApi\Transition.cs" />
-    <Compile Include="RestApi\ProjectVersion.cs" />
-    <Compile Include="SuggestionProviders\JiraFixForVersionSuggestionProvider.cs" />
-    <Compile Include="SuggestionProviders\JiraTransitionNameSuggestionProvider.cs" />
-    <Compile Include="SuggestionProviders\JiraIssueTypeNameSuggestionProvider.cs" />
-    <Compile Include="SuggestionProviders\JiraApiVersionSuggestionProvider.cs" />
-    <Compile Include="SuggestionProviders\JiraProjectNameSuggestionProvider.cs" />
-    <Compile Include="VariableFunctions\JiraApiVersionVariableFunction.cs" />
     <Compile Include="Web References\JiraApi\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -264,6 +240,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup />
+  <Import Project="..\Common\Common.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
