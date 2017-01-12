@@ -56,7 +56,9 @@ Transition-Issues(
         public string ToStatus { get; set; }
         [ScriptAlias("FixFor")]
         [DisplayName("With fix for version")]
+#if BuildMaster
         [PlaceholderText("$ReleaseNumber")]
+#endif
         [SuggestibleValue(typeof(JiraFixForVersionSuggestionProvider))]
         public string FixForVersion { get; set; }
         [ScriptAlias("Id")]

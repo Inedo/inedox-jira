@@ -62,7 +62,9 @@ Log-Information ""Issue '$JiraIssueId' was created in JIRA."";
         public string Description { get; set; }
         [ScriptAlias("FixFor")]
         [DisplayName("Fix for version")]
+#if BuildMaster
         [PlaceholderText("$ReleaseNumber")]
+#endif
         [SuggestibleValue(typeof(JiraFixForVersionSuggestionProvider))]
         public string FixForVersion { get; set; }
 

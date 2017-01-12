@@ -25,12 +25,12 @@ namespace Inedo.BuildMasterExtensions.Jira.VariableFunctions
 #if BuildMaster
         protected override object EvaluateScalar(IGenericBuildMasterContext context)
         {
-            return string.Empty;
+            return JiraApiType.AutoDetect;
         }
 #elif Otter
         protected override object EvaluateScalar(IOtterContext context)
         {
-            return string.Empty;
+            return JiraApiType.AutoDetect;
         }
 #endif
     }
