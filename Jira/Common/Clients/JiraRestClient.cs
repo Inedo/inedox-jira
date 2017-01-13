@@ -67,9 +67,9 @@ namespace Inedo.Extensions.Jira.Clients
 
             foreach (var issue in this.EnumerateIssues(context))
             {
-                if (!string.IsNullOrEmpty(fromStatus) && issue.Status != fromStatus)
+                if (!string.IsNullOrEmpty(fromStatus) && !string.Equals(issue.Status, fromStatus, StringComparison.OrdinalIgnoreCase))
                 {
-                    this.log.LogDebug($"{issue.Id} is not in the {fromStatus} status, and will not be changed.");
+                    this.log.LogDebug($"{issue.Id} ({issue.Status}) is not in the {fromStatus} status, and will not be changed.");
                     continue;
                 }
 
