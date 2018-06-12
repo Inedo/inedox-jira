@@ -2,7 +2,7 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/gpjvohy9ophufolt/branch/master?svg=true)](https://ci.appveyor.com/project/Inedo/inedox-jira/branch/master)
 
-Issue Tracking integration for JIRA 4 and later.
+Issue Tracking integration for JIRA 5 and later.
 
 ## Installation Instructions
 
