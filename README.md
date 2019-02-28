@@ -1,6 +1,6 @@
 # inedox-jira
 
-[![Build status](https://ci.appveyor.com/api/projects/status/gpjvohy9ophufolt/branch/master?svg=true)](https://ci.appveyor.com/project/Inedo/inedox-jira/branch/master)
+[![Build status](https://buildmaster.inedo.com/api/ci-badges/image?API_Key=badges&$ApplicationId=25)](https://buildmaster.inedo.com/api/ci-badges/link?API_Key=badges&$ApplicationId=25)
 
 Issue Tracking integration for JIRA 5 and later.
 
