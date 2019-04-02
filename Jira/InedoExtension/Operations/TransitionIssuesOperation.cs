@@ -45,7 +45,6 @@ Transition-Issues(
         public string ToStatus { get; set; }
         [ScriptAlias("FixFor")]
         [DisplayName("With fix for version")]
-        [PlaceholderText("$ReleaseNumber")]
         [SuggestableValue(typeof(JiraFixForVersionSuggestionProvider))]
         public string FixForVersion { get; set; }
         [ScriptAlias("Id")]
