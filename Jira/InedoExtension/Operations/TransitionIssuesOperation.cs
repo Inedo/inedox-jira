@@ -63,9 +63,7 @@ Transition-Issues(
             if (project == null)
                 return;
 
-            var fixForVersion = this.FixForVersion ?? (context as IStandardContext)?.SemanticVersion;
-
-            var jiraContext = new JiraContext(project, fixForVersion, null);
+            var jiraContext = new JiraContext(project, this.FixForVersion, null, FromStatus);
 
             if (this.IssueId != null)
             {
