@@ -2,12 +2,11 @@
 {
     internal sealed class JiraContext
     {
-        public JiraContext(JiraProject project, string fixForVersion, string customJql, string status = null)
+        public JiraContext(JiraProject project, string fixForVersion, string customJql)
         {
             this.Project = project ?? new JiraProject();
             this.FixForVersion = fixForVersion;
             this.CustomJql = AH.NullIf(customJql, string.Empty);
-            this.Status = AH.NullIf(status, string.Empty);
         }
 #if BuildMaster
         public JiraContext(JiraProvider provider, IssueTrackerConnectionContext c)
@@ -22,8 +21,7 @@
         public string FixForVersion { get; }
         public string ClosedState { get; }
         public string CustomJql { get; }
-        public string Status { get; }
-
+        
         public string GetJql()
         {
             if (!string.IsNullOrEmpty(this.CustomJql))
@@ -32,8 +30,7 @@
             string jql = $"project='{AH.CoalesceString(this.Project.Key, this.Project.Name)}'";
             if (!string.IsNullOrEmpty(this.FixForVersion))
                 jql += $" and fixVersion='{this.FixForVersion}'";
-            if (!string.IsNullOrEmpty(this.Status))
-                jql += $" and status='{this.Status}'";
+
             return jql;
         }
     }
