@@ -45,6 +45,7 @@ Transition-Issues(
         public string ToStatus { get; set; }
         [ScriptAlias("FixFor")]
         [DisplayName("With fix for version")]
+        [PlaceholderText("$ReleaseNumber")]
         [SuggestableValue(typeof(JiraFixForVersionSuggestionProvider))]
         public string FixForVersion { get; set; }
         [ScriptAlias("Id")]
@@ -63,7 +64,9 @@ Transition-Issues(
             if (project == null)
                 return;
 
-            var jiraContext = new JiraContext(project, this.FixForVersion, null, FromStatus);
+            var fixForVersion = this.FixForVersion ?? (context as IStandardContext)?.SemanticVersion;
+
+            var jiraContext = new JiraContext(project, fixForVersion, null);
 
             if (this.IssueId != null)
             {
