@@ -7,6 +7,8 @@
 *.userosscache
 *.sln.docstates
 
+*.testcredentials
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
@@ -14,7 +16,6 @@
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
-[Rr]eleases/
 [Xx]64/
 [Xx]86/
 [Bb]uild/
@@ -243,3 +244,5 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/Visual Studio 2015/
+/Visual Studio 2017/

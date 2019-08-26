@@ -20,12 +20,12 @@ namespace Inedo.Extensions.Jira.RestApi
             var type = (Dictionary<string, object>)fields["issuetype"];
 
             this.Id = issue["key"].ToString();
-            this.Description = fields["description"]?.ToString();
+            this.Description = fields.GetValueOrDefault("description")?.ToString();
             this.Status = status["name"].ToString();
-            this.IsClosed = fields["resolution"] != null;
+            this.IsClosed = fields.GetValueOrDefault("resolution") != null;
             this.SubmittedDate = DateTime.Parse(fields["created"].ToString());
             this.Submitter = reporter["name"].ToString();
-            this.Title = fields["summary"].ToString();
+            this.Title = fields.GetValueOrDefault("summary")?.ToString();
             this.Type = type["name"].ToString();
             this.Url = hostUrl + "/browse/" + this.Id;
         }

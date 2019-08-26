@@ -16,6 +16,9 @@ namespace Inedo.Extensions.Jira.SuggestionProviders
         {
             var empty = new[] { "$ReleaseNumber" };
 
+            if (config == null)
+                return empty;
+
             string credentialName = config["CredentialName"];
             if (string.IsNullOrEmpty(credentialName))
                 return empty;
@@ -24,7 +27,7 @@ namespace Inedo.Extensions.Jira.SuggestionProviders
             if (string.IsNullOrEmpty(projectName))
                 return empty;
 
-            var credential = ResourceCredentials.Create<JiraCredentials>(credentialName);
+            var credential = JiraCredentials.TryCreate(credentialName, config);
             if (credential == null)
                 return empty;
 

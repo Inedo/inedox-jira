@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using Inedo.Documentation;
+using Inedo.Extensibility;
 using Inedo.Extensibility.Credentials;
 using Inedo.Extensibility.IssueSources;
 using Inedo.Extensions.Jira.Clients;
@@ -39,7 +40,12 @@ namespace Inedo.Extensions.Jira.IssueSources
 
         public async override Task<IEnumerable<IIssueTrackerIssue>> EnumerateIssuesAsync(IIssueSourceEnumerationContext context)
         {
-            var credentials = this.TryGetCredentials<JiraCredentials>();
+            JiraCredentials credentials;
+
+            if (context is IStandardContext s)
+                credentials = this.TryGetCredentials(s.EnvironmentId, s.ProjectId) as JiraCredentials;
+            else    
+                credentials = this.TryGetCredentials();
 
             if (credentials == null)
                 throw new InvalidOperationException("Credentials must be supplied to enumerate JIRA issues.");

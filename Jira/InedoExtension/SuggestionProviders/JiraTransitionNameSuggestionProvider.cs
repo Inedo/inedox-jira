@@ -15,11 +15,14 @@ namespace Inedo.Extensions.Jira.SuggestionProviders
         {
             var empty = Enumerable.Empty<string>();
 
+            if (config == null)
+                return empty;
+
             string credentialName = config["CredentialName"];
             if (string.IsNullOrEmpty(credentialName))
                 return empty;
 
-            var credential = ResourceCredentials.Create<JiraCredentials>(credentialName);
+            var credential = JiraCredentials.TryCreate(credentialName, config);
             if (credential == null)
                 return empty;
 
