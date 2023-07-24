@@ -3,7 +3,7 @@
     <AssemblyName>Jira</AssemblyName>
     <RootNamespace>Inedo.Extensions.Jira</RootNamespace>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>net452;net5.0</TargetFrameworks>
+    <TargetFrameworks>net452</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
@@ -17,5 +17,8 @@
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Web.Extensions" />
   </ItemGroup>
 </Project>
