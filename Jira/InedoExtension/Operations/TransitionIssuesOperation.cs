@@ -3,22 +3,20 @@ using System.Threading.Tasks;
 using Inedo.Diagnostics;
 using Inedo.Documentation;
 using Inedo.Extensibility;
+using Inedo.Extensibility.IssueTrackers;
 using Inedo.Extensibility.Operations;
-using Inedo.Extensions.Jira.Clients;
+using Inedo.Extensions.Jira.Client;
 using Inedo.Extensions.Jira.Credentials;
-using Inedo.Extensions.Jira.SuggestionProviders;
-using Inedo.Web;
+using static Inedo.Extensions.Jira.Credentials.JiraProject;
 
 namespace Inedo.Extensions.Jira.Operations
 {
-    [DisplayName("Transition Jira Issues")]
     [Description("Transitions issues in JIRA.")]
-    [Tag("issue-tracking")]
     [ScriptAlias("Transition-Issues")]
     [Example(@"
 # closes issues for the HDARS project for the current release
 Transition-Issues(
-    ResourceName: Jira7Local,
+    From: Jira7Local,
     Project: HDARS,
     From: QA-InProgress,
     To: Closed
@@ -27,16 +25,6 @@ Transition-Issues(
     public sealed class TransitionIssuesOperation : JiraOperation
     {
 
-        [DisplayName("From Jira resource")]
-        [SuggestableValue(typeof(SecureResourceSuggestionProvider<JiraSecureResource>))]
-        [Required]
-        public override string ResourceName { get; set; }
-        [Required]
-        [ScriptAlias("Project")]
-        [DisplayName("Project name")]
-        [SuggestableValue(typeof(JiraProjectNameSuggestionProvider))]
-        public string ProjectName { get; set; }
-
         [ScriptAlias("From")]
         [DisplayName("From")]
         [PlaceholderText("Any status")]
@@ -44,44 +32,33 @@ Transition-Issues(
         [Required]
         [ScriptAlias("To")]
         [DisplayName("To")]
-        [SuggestableValue(typeof(JiraTransitionNameSuggestionProvider))]
         public string ToStatus { get; set; }
         [ScriptAlias("FixFor")]
         [DisplayName("With fix for version")]
         [PlaceholderText("$ReleaseNumber")]
-        [SuggestableValue(typeof(JiraFixForVersionSuggestionProvider))]
         public string FixForVersion { get; set; }
         [ScriptAlias("Id")]
         [DisplayName("Specific issue ID")]
         [PlaceholderText("Any")]
         [Description("If an issue ID is supplied, other filters will be ignored.")]
         public string IssueId { get; set; }
+        [ScriptAlias("Comment")]
+        [DisplayName("Comment")]
+        public string Comment { get; set; }
 
-        public override async Task ExecuteAsync(IOperationExecutionContext context)
+        private protected override async Task ExecuteAsync(IOperationExecutionContext context, JiraClient client, JiraProject project)
         {
             this.LogInformation($"Transitioning JIRA issue status {(this.IssueId != null ? $"of issue ID '{this.IssueId}' " : " ")}from '{(string.IsNullOrEmpty(this.FromStatus) ? "<any status>" : this.FromStatus)}' to '{this.ToStatus}'...");
 
 
-            var resource = this.GetResourceAndCredentials(context);
-
-            var client = JiraClient.Create(resource.resource.ServerUrl, resource.secureCredentials, this);
-
-            var project = await this.ResolveProjectAsync(client, this.ProjectName);
-            if (project == null)
-                return;
-
-            var fixForVersion = this.FixForVersion ?? context.ExpandVariables("$ReleaseNumber").AsString();
-
-            var jiraContext = new JiraContext(project, fixForVersion, null);
-
+            var queryFilter = $"project = \"{project.ProjectName}\" ";
+            if (this.FixForVersion != null)
+                queryFilter += $"AND fixVersion = {this.FixForVersion}";
             if (this.IssueId != null)
-            {
-                await client.TransitionIssueAsync(jiraContext, this.IssueId, this.ToStatus);
-            }
-            else
-            {
-                await client.TransitionIssuesInStatusAsync(jiraContext, this.FromStatus, this.ToStatus);
-            }
+                queryFilter += $"AND id = {this.IssueId}";
+            
+            await project.TransitionIssuesAsync(this.FromStatus, this.ToStatus, this.Comment, new OperationEnumerationContext(context, queryFilter), context.CancellationToken);
+            
 
             this.LogInformation("Issue(s) transitioned.");
         }
@@ -91,6 +68,23 @@ Transition-Issues(
             return new ExtendedRichDescription(
                 new RichDescription("Transition Jira Issues for project ", config[nameof(this.ProjectName)])
             );
+        }
+
+        private class OperationEnumerationContext : IIssuesEnumerationContext
+        {
+            public OperationEnumerationContext(IOperationExecutionContext context, string query)
+            {
+                this.Filter = new JiraIssuesQueryFilter(query);
+                this.ApplicationId = context.ApplicationId;
+                this.EnvironmentId = context.EnvironmentId;
+            }
+
+
+            public IssuesQueryFilter Filter { get; }
+
+            public int? EnvironmentId { get; }
+
+            public int? ApplicationId { get; }
         }
     }
 }
