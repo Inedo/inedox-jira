@@ -19,6 +19,7 @@ internal sealed class JiraClient
 {
     private readonly ILogSink? log;
     private readonly HttpClient httpClient;
+
     public JiraClient(string url, string userName, string password, ILogSink? log = null)
     {
         if (!url.EndsWith('/'))
@@ -154,6 +155,38 @@ internal sealed class JiraClient
         ).ConfigureAwait(false);
 
         response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<string> CreateIssueAsync(string projectId, string summary, string type, string? description = null, CancellationToken cancellationToken = default)
+    {
+        var obj = new JsonObject
+        {
+            ["summary"] = summary,
+            ["description"] = description,
+            ["project"] = new JsonObject
+            {
+                ["id"] = projectId
+            },
+            ["issuetype"] = new JsonObject
+            {
+                ["name"] = type
+            }
+        };
+
+        using var response = await this.httpClient.PostAsync(
+            "issue",
+            new StringContent(obj.ToJsonString(), InedoLib.UTF8Encoding, "application/json"),
+            cancellationToken
+        ).ConfigureAwait(false);
+
+        response.EnsureSuccessStatusCode();
+
+        using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+        using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (doc.RootElement.TryGetProperty("key", out var id) && id.ValueKind == JsonValueKind.String)
+            return id.GetString()!;
+        else
+            return string.Empty;
     }
 
     public async Task<bool> ProjectHasReleasesEnabled(string projectId, CancellationToken cancellationToken = default)
