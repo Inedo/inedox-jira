@@ -76,7 +76,7 @@ namespace Inedo.Extensions.Jira.Operations
                 if (this.UserName == null)
                     throw new ExecutionFailureException($"UserName must be specified when specifying a server url..");
                 if (this.ApiToken == null)
-                    throw new ExecutionFailureException($"PermanentToken must be specified when specifying a server url..");
+                    throw new ExecutionFailureException($"ApiToken must be specified when specifying a server url..");
 
                 project = new();
                 credentials = new() { ServiceUrl = this.ServerUrl, UserName = this.UserName, Password = this.ApiToken };

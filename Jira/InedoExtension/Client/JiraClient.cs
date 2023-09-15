@@ -224,9 +224,13 @@ internal sealed class JiraClient
         async Task<(bool isLast, TEntity[] items)> getPageAsync(int startAt)
         {
             char separator = url.Contains('?') ? '&' : '?';
+            this.log?.LogDebug($"Querying: {this.httpClient.BaseAddress}{url}{separator}startAt={startAt}");
             using var response = await this.httpClient.GetAsync($"{url}{separator}startAt={startAt}", HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             if (emptyOn404 && response.StatusCode == HttpStatusCode.NotFound)
+            {
+                this.log?.LogDebug("Received 404 response.");
                 return (true, Array.Empty<TEntity>());
+            }
 
             response.EnsureSuccessStatusCode();
 
