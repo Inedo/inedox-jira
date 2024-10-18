@@ -3,11 +3,11 @@
     <AssemblyName>Jira</AssemblyName>
     <RootNamespace>Inedo.Extensions.Jira</RootNamespace>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>net6.0</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Inedo.SDK" Version="2.4.0" ExcludeAssets="runtime" />
+    <PackageReference Include="Inedo.SDK" Version="3.1.0-ci.8" ExcludeAssets="runtime" />
   </ItemGroup>
 </Project>
