@@ -83,7 +83,7 @@ public sealed class JiraProject : IssueTrackerProject<JiraServiceCredentials>
                 Status: i.Fields.Status.Name,
                 Type: i.Fields.IssueType.Name,
                 Title: i.Fields.Summary ?? string.Empty,
-                Description: i.Fields.Description ?? string.Empty,
+                Description: i.RenderedFields.Description ?? string.Empty,
                 Submitter: i.Fields.Reporter.DisplayName,
                 SubmittedDate: DateTimeOffset.Parse(i.Fields.Created).UtcDateTime,
                 IsClosed: i.Fields.ResolutionDate != null,

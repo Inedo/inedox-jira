@@ -25,7 +25,7 @@ internal sealed class JiraClient
         if (!url.EndsWith('/'))
             url += "/";
 
-        url += "rest/api/2/";
+        url += "rest/api/3/";
 
         this.httpClient = SDK.CreateHttpClient();
         this.httpClient.BaseAddress = new Uri(url);
@@ -53,11 +53,9 @@ internal sealed class JiraClient
     {
         return this.GetPaginatedListAsync("project/search", JiraJsonContext.Default.JiraJsonProjectArray, cancellationToken);
     }
-    public IAsyncEnumerable<JiraJsonIssue> GetIssuesAsync(string? jql = null, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<JiraJsonIssue> GetIssuesAsync(string jql, CancellationToken cancellationToken = default)
     {
-        var url = "search";
-        if (!string.IsNullOrWhiteSpace(jql))
-            url = $"{url}?jql={Uri.EscapeDataString(jql)}";
+        var url = $"search/jql?jql={Uri.EscapeDataString(jql)}&fields={JiraIssueFields.FieldNames}&expand=renderedFields";
 
         return this.GetPaginatedListAsync(url, JiraJsonContext.Default.JiraJsonIssueArray, "issues", true, cancellationToken);
     }
@@ -209,27 +207,28 @@ internal sealed class JiraClient
     private IAsyncEnumerable<TEntity> GetPaginatedListAsync<TEntity>(string url, JsonTypeInfo<TEntity[]> jsonTypeInfo, CancellationToken cancellationToken) => this.GetPaginatedListAsync(url, jsonTypeInfo, "values", cancellationToken: cancellationToken);
     private async IAsyncEnumerable<TEntity> GetPaginatedListAsync<TEntity>(string url, JsonTypeInfo<TEntity[]> jsonTypeInfo, string propertyName, bool emptyOn404 = false, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        int startAt = 0;
+        string? nextPageToken = null;
 
         while (true)
         {
-            var (last, items) = await getPageAsync(startAt).ConfigureAwait(false);
+            var (nextPageToken2, items) = await getPageAsync(nextPageToken).ConfigureAwait(false);
             foreach (var i in items)
                 yield return i;
 
-            if (last)
+            if (nextPageToken2 is null)
                 break;
+            nextPageToken = nextPageToken2;
         }
 
-        async Task<(bool isLast, TEntity[] items)> getPageAsync(int startAt)
+        async Task<(string? nextPageToken, TEntity[] items)> getPageAsync(string? nextPageToken)
         {
             char separator = url.Contains('?') ? '&' : '?';
-            this.log?.LogDebug($"Querying: {this.httpClient.BaseAddress}{url}{separator}startAt={startAt}");
-            using var response = await this.httpClient.GetAsync($"{url}{separator}startAt={startAt}", HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            this.log?.LogDebug($"Querying: {this.httpClient.BaseAddress}{url}{separator}nextPageToken={nextPageToken}");
+            using var response = await this.httpClient.GetAsync($"{url}{separator}nextPageToken={nextPageToken}", HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             if (emptyOn404 && response.StatusCode == HttpStatusCode.NotFound)
             {
                 this.log?.LogDebug("Received 404 response.");
-                return (true, Array.Empty<TEntity>());
+                return (null, []);
             }
 
             response.EnsureSuccessStatusCode();
@@ -239,13 +238,15 @@ internal sealed class JiraClient
 
             if (doc.RootElement.TryGetProperty(propertyName, out var values) && values.ValueKind == JsonValueKind.Array)
             {
-                int total = doc.RootElement.GetProperty("total").GetInt32();
-                var items = JsonSerializer.Deserialize(values, jsonTypeInfo) ?? Array.Empty<TEntity>();
-                return (startAt + items.Length >= total, items);
+                nextPageToken = doc.RootElement.TryGetProperty("nextPageToken", out var nextPageTokenProp)
+                    ? nextPageTokenProp.GetString()
+                    : null;
+                var items = JsonSerializer.Deserialize(values, jsonTypeInfo) ?? [];
+                return (nextPageToken, items);
             }
             else
             {
-                return (true, Array.Empty<TEntity>());
+                return (null, []);
             }
         }
     }
